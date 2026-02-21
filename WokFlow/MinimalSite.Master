@@ -1,0 +1,66 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="MinimalSite.master.cs" Inherits="WokFlow.MinimalSite" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+   <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WokFlow - Culinary Learning Platform</title>
+
+    <!-- Tailwind CSS-->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!--Google fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Lucide Icon-->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body>
+    <form id="form1" runat="server"><asp:ScriptManager ID="ScriptManager1" runat="server" />
+
+        <!-- Decorative Ambient Glows -->
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+
+        <!-- Minimal Logo Header -->
+        <div class="w-full max-w-7xl mx-auto px-6 py-4 md:px-12">
+            <a href="~/Pages/Default.aspx" class="flex items-center gap-2 w-fit">
+                <div class="bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white p-1.5 rounded-lg shadow-lg shadow-orange-500/20">
+                    <i data-lucide="chef-hat" style="width:20px;height:20px;"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-[#1A1A1A]">WokFlow</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+
+        <!-- Footer -->
+        <footer class="w-full py-8 mt-auto relative z-10">
+            <div class="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 glass-panel rounded-2xl mx-6 md:mx-auto p-6">
+                <div class="flex flex-wrap justify-center gap-6 md:gap-8 text-sm font-medium text-gray-500">
+                    <a href="#" class="hover:text-[#FF8C66] transition-colors">Help Center</a>
+                    <a href="#" class="hover:text-[#FF8C66] transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-[#FF8C66] transition-colors">Privacy Policy</a>
+                </div>
+                <div class="text-sm text-gray-400 font-medium">
+                    @2026wokflow
+                </div>
+            </div>
+        </footer>
+    </form>
+
+    <script>lucide.createIcons();</script>
+    <script src="<%: ResolveUrl("~/Scripts/click-spark.js") %>"></script>
+
+    <asp:ContentPlaceHolder ID="ScriptsContent" runat="server" />
+</body>
+</html>
