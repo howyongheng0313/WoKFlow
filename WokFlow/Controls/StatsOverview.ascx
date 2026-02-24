@@ -12,9 +12,9 @@
                         <div class="text-sm font-medium text-white/80 mb-1"><%# Eval("Label") %></div>
                         <div class="text-3xl font-bold flex items-baseline gap-1">
                             <%# Eval("Value") %>
-                            <asp:Placeholder runat="server" Visible='<%# !string.IsNullOrEmpty(Eval("SubValue").ToString()) %>'>
+                            <asp:PlaceHolder runat="server" Visible='<%# !string.IsNullOrEmpty(Eval("SubValue")?.ToString()) %>'>
                                 <span class="text-lg font-normal opacity-80"><%# Eval("SubValue") %></span>
-                            </asp:Placeholder>
+                            </asp:PlaceHolder>
                         </div>
                     </div>
                 </div>

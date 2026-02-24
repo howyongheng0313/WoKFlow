@@ -103,12 +103,5 @@ namespace WokFlow.Pages.Admin
         }
 
         protected void Filter_Changed(object sender, EventArgs e) => BindData();
-
-        protected void btnReset_Click(object sender, EventArgs e)
-        {
-            txtSearch.Text = "";
-            ddlStatus.SelectedIndex = 0;
-            BindData();
-        }
     }
 }

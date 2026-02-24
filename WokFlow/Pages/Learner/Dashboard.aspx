@@ -4,11 +4,16 @@
     <div class="max-w-[1400px] mx-auto px-6 md:px-12 py-8 mt-4">
         <!-- Search and Filters -->
         <div class="flex flex-col md:flex-row gap-4 mb-8">
-            <asp:TextBox ID="txtSearch" runat="server" placeholder="Search courses..."
-                CssClass="flex-1 h-12 px-4 bg-white/60 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+            <!-- Search -->
+            <div class="relative flex-1 max-w-[300px]">
+                <asp:TextBox ID="txtSearch" runat="server" placeholder="Search courses..."
+                    CssClass="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
 
+            <!-- Filters -->
             <asp:DropDownList ID="ddlCuisine" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
-                CssClass="h-12 px-4 bg-white/60 border border-white/60 rounded-xl">
+                CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 appearance-none pr-8 cursor-pointer">
                 <asp:ListItem Text="All Cuisines" Value="" />
                 <asp:ListItem Text="Chinese" Value="Chinese" />
                 <asp:ListItem Text="Western" Value="Western" />
@@ -17,7 +22,7 @@
             </asp:DropDownList>
 
             <asp:DropDownList ID="ddlDifficulty" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
-                CssClass="h-12 px-4 bg-white/60 border border-white/60 rounded-xl">
+                CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 appearance-none pr-8 cursor-pointer">
                 <asp:ListItem Text="All Difficulties" Value="" />
                 <asp:ListItem Text="1 Star" Value="1" />
                 <asp:ListItem Text="2 Stars" Value="2" />
@@ -27,17 +32,15 @@
             </asp:DropDownList>
 
             <asp:DropDownList ID="ddlTimePosted" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
-                CssClass="h-12 px-4 bg-white/60 border border-white/60 rounded-xl">
+                CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 appearance-none pr-8 cursor-pointer">
                 <asp:ListItem Text="Time Posted" Value="" />
                 <asp:ListItem Text="Newest First" Value="newest" />
                 <asp:ListItem Text="Oldest First" Value="oldest" />
             </asp:DropDownList>
 
             <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="Filter_Changed"
-                CssClass="h-12 px-6 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-xl font-bold cursor-pointer border-0" />
+                CssClass="hidden" />
 
-            <asp:Button ID="btnReset" runat="server" Text="Reset" OnClick="btnReset_Click"
-                CssClass="h-12 px-6 border border-gray-300 rounded-xl font-medium cursor-pointer bg-white" />
         </div>
 
         <!-- Course Grid -->

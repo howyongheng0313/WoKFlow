@@ -32,7 +32,7 @@
 
         <!-- Minimal Logo Header -->
         <div class="w-full max-w-7xl mx-auto px-6 py-4 md:px-12">
-            <a href="~/Pages/Default.aspx" class="flex items-center gap-2 w-fit">
+            <a href=<%: ResolveUrl("~/Pages/Default.aspx") %> class="flex items-center gap-2 w-fit">
                 <div class="bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white p-1.5 rounded-lg shadow-lg shadow-orange-500/20">
                     <i data-lucide="chef-hat" style="width:20px;height:20px;"></i>
                 </div>

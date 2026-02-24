@@ -21,7 +21,7 @@
             <% if (UserRole == "SHARER") { %>
                 <!-- My Courses Dropdown (Sharer) -->
                 <div class="relative" id="myCoursesDropdown">
-                    <button onclick="toggleDropdown('myCoursesMenu', 'analyticsMenu')"
+                    <button type="button" onclick="toggleDropdown('myCoursesMenu', 'analyticsMenu')"
                         class="text-sm font-bold transition-all px-4 py-2 rounded-full flex items-center gap-1 <%= CurrentPage == "MyCourses" ? "nav-active" : "text-gray-500 hover:text-[#FF8C66]" %>">
                         My Courses
                         <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
@@ -40,7 +40,7 @@
 
                 <!-- Analytics Dropdown -->
                 <div class="relative" id="analyticsDropdown">
-                    <button onclick="toggleDropdown('analyticsMenu', 'myCoursesMenu')"
+                    <button type="button" onclick="toggleDropdown('analyticsMenu', 'myCoursesMenu')"
                             class="text-sm font-bold transition-all px-4 py-2 rounded-full flex items-center gap-1 <%= CurrentPage == "Analytics" ? "nav-active" : "text-gray-500 hover:text-[#FF8C66]" %>">
                         Analytics
                         <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>

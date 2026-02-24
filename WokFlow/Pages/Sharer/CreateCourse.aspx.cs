@@ -45,7 +45,12 @@ namespace WokFlow.Pages.Sharer
             get { return !string.IsNullOrEmpty(Request.QueryString["editId"]); }
         }
 
-        // Stores the uploaded image path between Step 1 → Step 2 postbacks
+        protected int ChapterCount
+        {
+            get { return ChapterList.Count; }
+        }
+
+        // Stores the uploaded image path between Step 1 -> Step 2 postbacks
         private string TempImagePath
         {
             get { return ViewState["TempImagePath"] as string; }
@@ -78,7 +83,7 @@ namespace WokFlow.Pages.Sharer
                 txtTitle.Text = course.Title;
                 txtDescription.Text = course.Description;
                 ddlCuisine.SelectedValue = course.CuisineId.ToString();
-                ddlDifficulty.SelectedValue = course.Difficulty.ToString();
+                hdnDifficulty.Value = course.Difficulty.ToString();
                 txtDuration.Text = course.Duration;
 
                 if (!string.IsNullOrEmpty(course.ImageUrl))
@@ -132,7 +137,7 @@ namespace WokFlow.Pages.Sharer
             }
         }
 
-        // ── Step Navigation ────────────────────────────────────────────────────
+        // -- Step Navigation --------------------------------------------------
         protected void btnNext_Click(object sender, EventArgs e)
         {
             // Upload image NOW while the file data is still available (multi-step form limitation)
@@ -151,8 +156,7 @@ namespace WokFlow.Pages.Sharer
             CurrentStep = 2;
             pnlStep1.Visible = false;
             pnlStep2.Visible = true;
-            rptChapters.DataSource = ChapterList;
-            rptChapters.DataBind();
+            BindChapters();
         }
 
         protected void btnBack_Click(object sender, EventArgs e)
@@ -162,27 +166,43 @@ namespace WokFlow.Pages.Sharer
             pnlStep2.Visible = false;
         }
 
-        // ── Add Chapter ────────────────────────────────────────────────────────
-        protected void btnAddChapter_Click(object sender, EventArgs e)
+        // -- Add Chapter placeholder (shows form / adds default chapter) ------
+        protected void btnAddChapterPlaceholder_Click(object sender, EventArgs e)
         {
             string title = txtChapterTitle.Text.Trim();
-            if (string.IsNullOrEmpty(title)) return;
-
-            int correctIdx = int.Parse(ddlCorrectAnswer.SelectedValue) - 1;
-            var answerTexts = new[]
+            if (string.IsNullOrEmpty(title))
             {
-                txtAnswer1.Text.Trim(),
-                txtAnswer2.Text.Trim(),
-                txtAnswer3.Text.Trim(),
-                txtAnswer4.Text.Trim()
-            };
+                // If no title entered yet, create a placeholder
+                title = "Untitled Chapter";
+            }
 
-            var entry = new ChapterEntry
+            // Gather video URL from text field (file upload is optional enhancement)
+            string videoUrl = txtVideoUrl.Text.Trim();
+            if (fuChapterVideo.HasFile)
             {
-                Title = title,
-                Description = txtChapterDescription.Text.Trim(),
-                VideoUrl = txtVideoUrl.Text.Trim(),
-                Question = new QuestionEntry
+                string uploadDir = Server.MapPath("~/Videos/chapters/");
+                if (!Directory.Exists(uploadDir))
+                    Directory.CreateDirectory(uploadDir);
+
+                string safeFileName = DateTime.UtcNow.Ticks + "_" +
+                    Path.GetFileName(fuChapterVideo.FileName);
+                fuChapterVideo.SaveAs(Path.Combine(uploadDir, safeFileName));
+                videoUrl = "/Videos/chapters/" + safeFileName;
+            }
+
+            // Build quiz entry from the question form (if visible and filled)
+            var questionEntry = new QuestionEntry();
+            if (pnlAddQuestion.Visible && !string.IsNullOrEmpty(txtQuestionText.Text.Trim()))
+            {
+                int correctIdx = int.Parse(ddlCorrectAnswer.SelectedValue) - 1;
+                var answerTexts = new[]
+                {
+                    txtAnswer1.Text.Trim(),
+                    txtAnswer2.Text.Trim(),
+                    txtAnswer3.Text.Trim(),
+                    txtAnswer4.Text.Trim()
+                };
+                questionEntry = new QuestionEntry
                 {
                     QuestionText = txtQuestionText.Text.Trim(),
                     Answers = answerTexts.Select((text, i) => new AnswerEntry
@@ -190,7 +210,15 @@ namespace WokFlow.Pages.Sharer
                         Text = text,
                         IsCorrect = i == correctIdx
                     }).ToList()
-                }
+                };
+            }
+
+            var entry = new ChapterEntry
+            {
+                Title = title,
+                Description = txtChapterDescription.Text.Trim(),
+                VideoUrl = videoUrl,
+                Question = questionEntry
             };
 
             var chapters = ChapterList;
@@ -204,12 +232,71 @@ namespace WokFlow.Pages.Sharer
             txtQuestionText.Text = "";
             txtAnswer1.Text = txtAnswer2.Text = txtAnswer3.Text = txtAnswer4.Text = "";
             ddlCorrectAnswer.SelectedIndex = 0;
+            pnlAddQuestion.Visible = false;
 
-            rptChapters.DataSource = chapters;
-            rptChapters.DataBind();
+            BindChapters();
         }
 
-        // ── Save Course ────────────────────────────────────────────────────────
+        // -- Toggle Add Question form visibility ------------------------------
+        protected void btnToggleQuestion_Click(object sender, EventArgs e)
+        {
+            pnlAddQuestion.Visible = !pnlAddQuestion.Visible;
+            BindChapters(); // rebind to keep chapter list visible
+        }
+
+        // -- Helper: bind chapters and update quiz chapter dropdown -----------
+        private void BindChapters()
+        {
+            var chapters = ChapterList;
+            rptChapters.DataSource = chapters;
+            rptChapters.DataBind();
+
+            // Update quiz chapter dropdown
+            ddlQuizChapter.Items.Clear();
+            ddlQuizChapter.Items.Add(new System.Web.UI.WebControls.ListItem("Select chapter...", ""));
+            for (int i = 0; i < chapters.Count; i++)
+            {
+                ddlQuizChapter.Items.Add(new System.Web.UI.WebControls.ListItem(
+                    chapters[i].Title, (i + 1).ToString()));
+            }
+
+            // Update label
+            if (chapters.Count > 0)
+            {
+                lblQuizChapter.Text = chapters.Last().Title;
+            }
+            else
+            {
+                lblQuizChapter.Text = "Untitled Chapter";
+            }
+
+            // Show/hide quiz question list
+            var questionsWithContent = chapters
+                .Where(c => c.Question != null && !string.IsNullOrEmpty(c.Question.QuestionText))
+                .Select(c => c.Question)
+                .ToList();
+
+            if (questionsWithContent.Count > 0)
+            {
+                pnlNoQuestions.Visible = false;
+                pnlQuizQuestions.Visible = true;
+                rptQuizPreview.DataSource = questionsWithContent;
+                rptQuizPreview.DataBind();
+            }
+            else
+            {
+                pnlNoQuestions.Visible = true;
+                pnlQuizQuestions.Visible = false;
+            }
+        }
+
+        // -- Legacy handler kept for compatibility ----------------------------
+        protected void btnAddChapter_Click(object sender, EventArgs e)
+        {
+            btnAddChapterPlaceholder_Click(sender, e);
+        }
+
+        // -- Save Course ------------------------------------------------------
         protected void btnSaveCourse_Click(object sender, EventArgs e)
         {
             using (var db = new WokFlowContext())
@@ -237,8 +324,19 @@ namespace WokFlow.Pages.Sharer
 
                 course.Title = txtTitle.Text.Trim();
                 course.Description = txtDescription.Text.Trim();
-                course.CuisineId = int.Parse(ddlCuisine.SelectedValue);
-                course.Difficulty = int.Parse(ddlDifficulty.SelectedValue);
+
+                // Parse cuisine - handle empty placeholder value
+                int cuisineId;
+                if (int.TryParse(ddlCuisine.SelectedValue, out cuisineId))
+                    course.CuisineId = cuisineId;
+
+                // Difficulty from hidden field (star rating)
+                int difficulty;
+                if (int.TryParse(hdnDifficulty.Value, out difficulty))
+                    course.Difficulty = difficulty;
+                else
+                    course.Difficulty = 1;
+
                 course.Duration = txtDuration.Text.Trim();
                 course.UpdatedAt = DateTime.UtcNow;
 
@@ -316,7 +414,7 @@ namespace WokFlow.Pages.Sharer
             }
         }
 
-        // ── View Helpers ───────────────────────────────────────────────────────
+        // -- View Helpers -----------------------------------------------------
         protected string GetQuizPreview(object questionObj)
         {
             var q = questionObj as QuestionEntry;

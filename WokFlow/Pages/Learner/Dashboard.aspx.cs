@@ -186,16 +186,6 @@ namespace WokFlow.Pages.Learner
             BindCourses();
         }
 
-        protected void btnReset_Click(object sender, EventArgs e)
-        {
-            txtSearch.Text = "";
-            ddlCuisine.SelectedIndex = 0;
-            ddlDifficulty.SelectedIndex = 0;
-            ddlTimePosted.SelectedIndex = 0;
-            CurrentPage = 1;
-            BindCourses();
-        }
-
         protected void btnPrev_Click(object sender, EventArgs e)
         {
             if (CurrentPage > 1)

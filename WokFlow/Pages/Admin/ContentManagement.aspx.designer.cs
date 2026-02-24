@@ -51,15 +51,6 @@ namespace WokFlow.Pages.Admin
         protected global::System.Web.UI.WebControls.Button btnSearch;
 
         /// <summary>
-        /// btnReset control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnReset;
-
-        /// <summary>
         /// rptReports control.
         /// </summary>
         /// <remarks>

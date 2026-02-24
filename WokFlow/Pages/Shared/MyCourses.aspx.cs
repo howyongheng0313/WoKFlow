@@ -40,8 +40,35 @@ namespace WokFlow.Pages.Shared
         {
             if (!IsPostBack)
             {
-                pnlSharerTabs.Visible = IsSharer;
+                SetupPage();
                 BindData();
+            }
+        }
+
+        private void SetupPage()
+        {
+            // Dynamic page title
+            if (IsSharer && ActiveTab == "created")
+            {
+                litPageTitle.Text = "Created Courses";
+                pnlCreateBtn.Visible = true;
+                txtSearch.Attributes["placeholder"] = "Search created courses...";
+                // Status options for Created tab
+                ddlStatus.Items.Clear();
+                ddlStatus.Items.Add(new ListItem("All Status", ""));
+                ddlStatus.Items.Add(new ListItem("Active", "Active"));
+                ddlStatus.Items.Add(new ListItem("Deleted", "Deleted"));
+            }
+            else
+            {
+                litPageTitle.Text = "Joined Courses";
+                pnlCreateBtn.Visible = false;
+                txtSearch.Attributes["placeholder"] = "Search joined courses...";
+                // Status options for Joined tab
+                ddlStatus.Items.Clear();
+                ddlStatus.Items.Add(new ListItem("All Status", ""));
+                ddlStatus.Items.Add(new ListItem("In Progress", "In Progress"));
+                ddlStatus.Items.Add(new ListItem("Completed", "Completed"));
             }
         }
 
@@ -63,19 +90,25 @@ namespace WokFlow.Pages.Shared
                     if (!string.IsNullOrEmpty(search))
                         courses = courses.Where(c => c.Title.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
 
-                    var courseIds = courses.Select(c => c.CourseId).ToList();
-                    var learnerEnrollments = db.Enrollments
-                        .Where(en => courseIds.Contains(en.CourseId))
+                    string statusFilter = ddlStatus.SelectedValue;
+                    if (!string.IsNullOrEmpty(statusFilter))
+                        courses = courses.Where(c => c.Status == statusFilter).ToList();
+
+                    // Total students enrolled across all creator's courses
+                    var allCourseIds = db.Courses
+                        .Where(c => c.CreatorId == CurrentUserId)
+                        .Select(c => c.CourseId)
                         .ToList();
-                    string avgProgress = learnerEnrollments.Any()
-                        ? Math.Round(learnerEnrollments.Average(en => en.Progress)).ToString() + "%"
-                        : "N/A";
+                    int totalStudents = db.Enrollments
+                        .Count(en => allCourseIds.Contains(en.CourseId));
+                    int totalCreated = db.Courses.Count(c => c.CreatorId == CurrentUserId);
+                    int activeCourses = db.Courses.Count(c => c.CreatorId == CurrentUserId && c.Status == "Active");
 
                     dashStats.Items = new List<StatItemData>
                     {
-                        new StatItemData { Icon = "book-open", Label = "Created Courses", Value = courses.Count.ToString() },
-                        new StatItemData { Icon = "check-circle", Label = "Active", Value = courses.Count(c => c.Status == "Active").ToString() },
-                        new StatItemData { Icon = "trending-up", Label = "Average Progress", Value = avgProgress }
+                        new StatItemData { Icon = "edit-3", Label = "Total Created", Value = totalCreated.ToString() },
+                        new StatItemData { Icon = "zap", Label = "Active Courses", Value = activeCourses.ToString() },
+                        new StatItemData { Icon = "users", Label = "Total Students", Value = totalStudents.ToString("N0") }
                     };
 
                     // Pagination
@@ -123,11 +156,21 @@ namespace WokFlow.Pages.Shared
                     if (!string.IsNullOrEmpty(statusFilter))
                         enrollments = enrollments.Where(en => en.Status == statusFilter).ToList();
 
+                    int totalEnrolled = db.Enrollments.Count(en => en.UserId == CurrentUserId);
+                    int completed = db.Enrollments.Count(en => en.UserId == CurrentUserId && en.Status == "Completed");
+                    var allProgress = db.Enrollments
+                        .Where(en => en.UserId == CurrentUserId)
+                        .Select(en => en.Progress)
+                        .ToList();
+                    string avgProgress = allProgress.Any()
+                        ? Math.Round(allProgress.Average(p => (double)p)).ToString()
+                        : "0";
+
                     dashStats.Items = new List<StatItemData>
                     {
-                        new StatItemData { Icon = "book-open", Label = "Enrolled Courses", Value = enrollments.Count.ToString() },
-                        new StatItemData { Icon = "check-circle", Label = "Completed", Value = enrollments.Count(en => en.Status == "Completed").ToString() },
-                        new StatItemData { Icon = "trending-up", Label = "Average Progress", Value = enrollments.Any() ? Math.Round(enrollments.Average(en => en.Progress)).ToString() + "%" : "0%" }
+                        new StatItemData { Icon = "book-open", Label = "Enrolled Courses", Value = totalEnrolled.ToString() },
+                        new StatItemData { Icon = "check-circle", Label = "Completed", Value = completed.ToString() },
+                        new StatItemData { Icon = "trending-up", Label = "Average Progress", Value = avgProgress, SubValue = "%" }
                     };
 
                     // Pagination

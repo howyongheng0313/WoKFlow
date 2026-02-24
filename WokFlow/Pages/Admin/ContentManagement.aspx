@@ -7,56 +7,63 @@
         <uc:DashboardStats ID="dashStats" runat="server" CssClass="mb-8" />
 
         <!-- Filters -->
-        <div class="flex gap-4 mb-6">
-            <asp:TextBox ID="txtSearch" runat="server" placeholder="Search by course or reporter..."
-                CssClass="flex-1 h-12 px-4 bg-white/60 border border-white/60 rounded-xl" />
+        <div class="flex gap-3 mb-4">
+            <div class="relative flex-1 max-w-[300px]">
+                <asp:TextBox ID="txtSearch" runat="server" placeholder="Search by course or reporter..."
+                    CssClass="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
             <asp:DropDownList ID="ddlStatus" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
-                CssClass="h-12 px-4 bg-white/60 border border-white/60 rounded-xl">
-                <asp:ListItem Text="All Status" Value="" />
+                CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none">
                 <asp:ListItem Text="Pending" Value="Pending" />
                 <asp:ListItem Text="Ignored" Value="Ignored" />
                 <asp:ListItem Text="Banned" Value="Banned" />
+                <asp:ListItem Text="All Status" Value="" />
             </asp:DropDownList>
             <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="Filter_Changed"
-                CssClass="h-12 px-6 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-xl font-bold cursor-pointer border-0" />
-            <asp:Button ID="btnReset" runat="server" Text="Reset" OnClick="btnReset_Click"
-                CssClass="h-12 px-6 border border-gray-300 rounded-xl font-medium cursor-pointer bg-white" />
+                CssClass="hidden" />
         </div>
 
         <!-- Table -->
-        <div class="glass-panel rounded-2xl overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-gray-100/60 overflow-hidden">
             <table class="w-full">
                 <thead>
-                    <tr class="border-b border-gray-200 bg-white/40">
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Course</th>
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Reporter</th>
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Reason</th>
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Date</th>
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Status</th>
-                        <th class="text-left py-4 px-6 text-sm font-bold text-gray-600">Action</th>
+                    <tr class="border-b border-gray-200">
+                        <th class="text-left py-4 px-8 text-sm font-bold text-gray-800">Course</th>
+                        <th class="text-left py-4 px-8 text-sm font-bold text-gray-800">Reporter</th>
+                        <th class="text-left py-4 px-8 text-sm font-bold text-gray-800">Reason</th>
+                        <th class="text-left py-4 px-8 text-sm font-bold text-gray-800">Date</th>
+                        <th class="text-left py-4 px-8 text-sm font-bold text-gray-800">Status</th>
+                        <th class="py-4 px-4 text-sm font-bold text-gray-800"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <asp:Repeater ID="rptReports" runat="server" OnItemCommand="rptReports_ItemCommand">
                         <ItemTemplate>
-                            <tr class="border-b border-gray-100 hover:bg-white/40">
-                                <td class="py-4 px-6 text-sm font-medium"><%# Eval("CourseTitle") %></td>
-                                <td class="py-4 px-6 text-sm text-gray-500"><%# Eval("ReporterName") %></td>
-                                <td class="py-4 px-6 text-sm text-gray-500 max-w-xs truncate"><%# Eval("Reason") %></td>
-                                <td class="py-4 px-6 text-sm text-gray-500"><%# ((DateTime)Eval("ReportDate")).ToString("yyyy-MM-dd") %></td>
-                                <td class="py-4 px-6">
-                                    <span class="text-xs font-bold px-3 py-1 rounded-full <%GetStatusCss(Eval("Status").ToString()); %>"><%# Eval("Status") %></span>
-                                </td>
-                                <td class="py-4 px-6">
-                                    <asp:Button ID="btnBan" runat="server" CommandName="Ban" CommandArgument='<%# Eval("ReportId") %>'
-                                        Text="Ban" Visible='<%# Eval("Status").ToString() == "Pending" %>'
-                                        CssClass="px-3 py-1.5 text-xs font-bold bg-red-50 text-red-600 border border-red-200 rounded-lg cursor-pointer mr-1" />
-                                    <asp:Button ID="btnIgnore" runat="server" CommandName="Ignore" CommandArgument='<%# Eval("ReportId") %>'
-                                        Text="Ignore" Visible='<%# Eval("Status").ToString() == "Pending" %>'
-                                        CssClass="px-3 py-1.5 text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 rounded-lg cursor-pointer" />
-                                    <asp:Button ID="btnUndo" runat="server" CommandName="Undo" CommandArgument='<%# Eval("ReportId") %>'
-                                        Text="Undo" Visible='<%# Eval("Status").ToString() != "Pending" %>'
-                                        CssClass="px-3 py-1.5 text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 rounded-lg cursor-pointer" />
+                            <tr class="border-b border-gray-100 hover:bg-[#FFF8F0] transition-colors">
+                                <td class="py-5 px-8 text-sm font-medium text-[#1A1A1A]"><%# Eval("CourseTitle") %></td>
+                                <td class="py-5 px-8 text-sm text-gray-500"><%# Eval("ReporterName") %></td>
+                                <td class="py-5 px-8 text-sm text-gray-500 max-w-xs truncate"><%# Eval("Reason") %></td>
+                                <td class="py-5 px-8 text-sm text-gray-500"><%# ((DateTime)Eval("ReportDate")).ToString("yyyy-MM-dd") %></td>
+                                <td class="py-5 px-8 text-sm text-gray-500"><%# Eval("Status") %></td>
+                                <td class="py-5 px-4">
+                                    <div class="relative inline-block">
+                                        <button type="button" onclick="openKebabMenu(event, this)"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                                        </button>
+                                        <div class="kebab-menu hidden fixed z-50 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1">
+                                            <asp:LinkButton ID="lnkBan" runat="server" CommandName="Ban" CommandArgument='<%# Eval("ReportId") %>'
+                                                Visible='<%# Eval("Status").ToString() == "Pending" %>'
+                                                CssClass="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Ban</asp:LinkButton>
+                                            <asp:LinkButton ID="lnkIgnore" runat="server" CommandName="Ignore" CommandArgument='<%# Eval("ReportId") %>'
+                                                Visible='<%# Eval("Status").ToString() == "Pending" %>'
+                                                CssClass="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Ignore</asp:LinkButton>
+                                            <asp:LinkButton ID="lnkUndo" runat="server" CommandName="Undo" CommandArgument='<%# Eval("ReportId") %>'
+                                                Visible='<%# Eval("Status").ToString() != "Pending" %>'
+                                                CssClass="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Undo</asp:LinkButton>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </ItemTemplate>
@@ -65,4 +72,23 @@
             </table>
         </div>
     </div>
+
+    <script>
+        function openKebabMenu(e, btn) {
+            e.stopPropagation();
+            var menu = btn.nextElementSibling;
+            var wasHidden = menu.classList.contains('hidden');
+            document.querySelectorAll('.kebab-menu').forEach(function (m) { m.classList.add('hidden'); });
+            if (wasHidden) {
+                var rect = btn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 4) + 'px';
+                menu.style.left = (rect.right - 144) + 'px';
+                menu.classList.remove('hidden');
+            }
+        }
+        document.addEventListener('click', function () {
+            document.querySelectorAll('.kebab-menu').forEach(function (m) { m.classList.add('hidden'); });
+        });
+        lucide.createIcons();
+    </script>
 </asp:Content>

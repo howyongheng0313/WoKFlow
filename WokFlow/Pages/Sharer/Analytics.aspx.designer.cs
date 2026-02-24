@@ -24,33 +24,6 @@ namespace WokFlow.Pages.Sharer
         protected global::WokFlow.Controls.DashboardStats dashStats;
 
         /// <summary>
-        /// lnkPerformance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkPerformance;
-
-        /// <summary>
-        /// lnkQuiz control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkQuiz;
-
-        /// <summary>
-        /// lnkComments control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkComments;
-
-        /// <summary>
         /// pnlPerformance control.
         /// </summary>
         /// <remarks>
@@ -141,15 +114,6 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.DropDownList ddlQuizStatus;
 
         /// <summary>
-        /// btnApplyQuiz control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnApplyQuiz;
-
-        /// <summary>
         /// rptQuizResults control.
         /// </summary>
         /// <remarks>
@@ -166,6 +130,33 @@ namespace WokFlow.Pages.Sharer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNoQuiz;
+
+        /// <summary>
+        /// lblQuizShowing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblQuizShowing;
+
+        /// <summary>
+        /// btnQuizPrev control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnQuizPrev;
+
+        /// <summary>
+        /// btnQuizNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnQuizNext;
 
         /// <summary>
         /// pnlComments control.
@@ -186,15 +177,6 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.DropDownList ddlCommentCourse;
 
         /// <summary>
-        /// btnApplyComments control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnApplyComments;
-
-        /// <summary>
         /// rptComments control.
         /// </summary>
         /// <remarks>
@@ -211,5 +193,32 @@ namespace WokFlow.Pages.Sharer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNoComments;
+
+        /// <summary>
+        /// lblCommentShowing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCommentShowing;
+
+        /// <summary>
+        /// btnCommentPrev control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCommentPrev;
+
+        /// <summary>
+        /// btnCommentNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCommentNext;
     }
 }

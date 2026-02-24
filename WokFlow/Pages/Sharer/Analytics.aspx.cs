@@ -13,9 +13,35 @@ namespace WokFlow.Pages.Sharer
 {
     public partial class Analytics : SharerPage
     {
+        private const int PageSize = 8;
+
         protected string ActiveTab
         {
             get { return Request.QueryString["tab"] ?? "performance"; }
+        }
+
+        private int QuizPage
+        {
+            get { return ViewState["QuizPage"] as int? ?? 1; }
+            set { ViewState["QuizPage"] = value; }
+        }
+
+        private int QuizTotalPages
+        {
+            get { return ViewState["QuizTotalPages"] as int? ?? 1; }
+            set { ViewState["QuizTotalPages"] = value; }
+        }
+
+        private int CommentPage
+        {
+            get { return ViewState["CommentPage"] as int? ?? 1; }
+            set { ViewState["CommentPage"] = value; }
+        }
+
+        private int CommentTotalPages
+        {
+            get { return ViewState["CommentTotalPages"] as int? ?? 1; }
+            set { ViewState["CommentTotalPages"] = value; }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -33,12 +59,6 @@ namespace WokFlow.Pages.Sharer
             pnlPerformance.Visible = ActiveTab == "performance";
             pnlQuiz.Visible = ActiveTab == "quiz";
             pnlComments.Visible = ActiveTab == "comments";
-
-            string activeClass = "nav-active px-6 py-2 rounded-full text-sm font-bold no-underline";
-            string inactiveClass = "bg-white/60 text-gray-600 px-6 py-2 rounded-full text-sm font-bold no-underline";
-            lnkPerformance.Attributes["class"] = ActiveTab == "performance" ? activeClass : inactiveClass;
-            lnkQuiz.Attributes["class"] = ActiveTab == "quiz" ? activeClass : inactiveClass;
-            lnkComments.Attributes["class"] = ActiveTab == "comments" ? activeClass : inactiveClass;
         }
 
         private void PopulateFilterDropdowns()
@@ -78,22 +98,23 @@ namespace WokFlow.Pages.Sharer
                     .Select(c => c.CourseId)
                     .ToList();
 
-                // Stats: all real values from DB
-                int activeCourses = db.Courses.Count(c => c.CreatorId == CurrentUserId && c.Status == "Active");
+                // Stats
                 int totalStudents = db.Enrollments.Count(en => myCourseIds.Contains(en.CourseId));
-                int completed = db.Enrollments.Count(en => myCourseIds.Contains(en.CourseId) && en.Status == "Completed");
 
                 var ratingQuery = db.Comments.Where(c => myCourseIds.Contains(c.CourseId));
                 string avgRating = ratingQuery.Any()
                     ? Math.Round(ratingQuery.Average(c => c.Rating), 1).ToString("0.0")
                     : "N/A";
 
+                int totalEnrollments = db.Enrollments.Count(en => myCourseIds.Contains(en.CourseId));
+                int completedHours = db.Enrollments.Count(en => myCourseIds.Contains(en.CourseId) && en.Status == "Completed");
+
                 dashStats.Items = new List<StatItemData>
                 {
-                    new StatItemData { Icon = "book-open",    Label = "Active Courses",  Value = activeCourses.ToString() },
-                    new StatItemData { Icon = "star",         Label = "Average Rating",  Value = avgRating },
-                    new StatItemData { Icon = "users",        Label = "Total Students",  Value = totalStudents.ToString() },
-                    new StatItemData { Icon = "check-circle", Label = "Completed",       Value = completed.ToString() }
+                    new StatItemData { Icon = "eye",      Label = "Total Views",    Value = totalEnrollments.ToString() },
+                    new StatItemData { Icon = "edit-3",    Label = "Average Rating", Value = avgRating },
+                    new StatItemData { Icon = "users",     Label = "Students",       Value = totalStudents.ToString() },
+                    new StatItemData { Icon = "clock",     Label = "Watch Time",     Value = completedHours.ToString(), SubValue = "h" }
                 };
 
                 if (ActiveTab == "performance")
@@ -114,7 +135,7 @@ namespace WokFlow.Pages.Sharer
             if (!string.IsNullOrEmpty(txtStartDate.Text))
                 startDate = DateTime.Parse(txtStartDate.Text);
             if (!string.IsNullOrEmpty(txtEndDate.Text))
-                endDate = DateTime.Parse(txtEndDate.Text).AddDays(1); // include full end day
+                endDate = DateTime.Parse(txtEndDate.Text).AddDays(1);
 
             var courses = db.Courses
                 .Where(c => myCourseIds.Contains(c.CourseId))
@@ -139,7 +160,8 @@ namespace WokFlow.Pages.Sharer
 
         protected void btnApplyFilter_Click(object sender, EventArgs e)
         {
-            // Page_Load already calls LoadTabData with the current filter values.
+            QuizPage = 1;
+            CommentPage = 1;
         }
 
         protected void btnClearPerf_Click(object sender, EventArgs e)
@@ -155,7 +177,6 @@ namespace WokFlow.Pages.Sharer
             string courseFilter = ddlQuizCourse.SelectedValue;
             string statusFilter = ddlQuizStatus.SelectedValue;
 
-            // Build filtered course ID list
             var courseQuery = db.Courses
                 .Where(c => myCourseIds.Contains(c.CourseId))
                 .Include("Cuisine");
@@ -181,7 +202,7 @@ namespace WokFlow.Pages.Sharer
             if (!string.IsNullOrEmpty(statusFilter))
                 query = query.Where(q => q.Status == statusFilter);
 
-            var results = query
+            var allResults = query
                 .OrderByDescending(q => q.CompletedDate)
                 .Select(q => new
                 {
@@ -191,9 +212,34 @@ namespace WokFlow.Pages.Sharer
                     q.Status
                 }).ToList();
 
-            lblNoQuiz.Visible = results.Count == 0;
-            rptQuizResults.DataSource = results;
+            int total = allResults.Count;
+            QuizTotalPages = total == 0 ? 1 : (int)Math.Ceiling(total / (double)PageSize);
+            if (QuizPage > QuizTotalPages) QuizPage = QuizTotalPages;
+            if (QuizPage < 1) QuizPage = 1;
+
+            int startIdx = (QuizPage - 1) * PageSize;
+            int endIdx = Math.Min(startIdx + PageSize, total);
+            lblQuizShowing.Text = total == 0
+                ? "0 items"
+                : string.Format("{0} - {1} of {2} items", startIdx + 1, endIdx, total);
+            btnQuizPrev.Enabled = QuizPage > 1;
+            btnQuizNext.Enabled = QuizPage < QuizTotalPages;
+
+            var paged = allResults.Skip(startIdx).Take(PageSize).ToList();
+
+            lblNoQuiz.Visible = total == 0;
+            rptQuizResults.DataSource = paged;
             rptQuizResults.DataBind();
+        }
+
+        protected void btnQuizPrev_Click(object sender, EventArgs e)
+        {
+            if (QuizPage > 1) QuizPage--;
+        }
+
+        protected void btnQuizNext_Click(object sender, EventArgs e)
+        {
+            if (QuizPage < QuizTotalPages) QuizPage++;
         }
 
         // ── Comments ───────────────────────────────────────────────────────────
@@ -212,7 +258,7 @@ namespace WokFlow.Pages.Sharer
                 filteredIds = myCourseIds;
             }
 
-            var comments = db.Comments
+            var allComments = db.Comments
                 .Where(c => filteredIds.Contains(c.CourseId))
                 .Include("User")
                 .OrderByDescending(c => c.CreatedDate)
@@ -224,9 +270,34 @@ namespace WokFlow.Pages.Sharer
                     c.CreatedDate
                 }).ToList();
 
-            lblNoComments.Visible = comments.Count == 0;
-            rptComments.DataSource = comments;
+            int total = allComments.Count;
+            CommentTotalPages = total == 0 ? 1 : (int)Math.Ceiling(total / (double)PageSize);
+            if (CommentPage > CommentTotalPages) CommentPage = CommentTotalPages;
+            if (CommentPage < 1) CommentPage = 1;
+
+            int startIdx = (CommentPage - 1) * PageSize;
+            int endIdx = Math.Min(startIdx + PageSize, total);
+            lblCommentShowing.Text = total == 0
+                ? "0 items"
+                : string.Format("{0} - {1} of {2} items", startIdx + 1, endIdx, total);
+            btnCommentPrev.Enabled = CommentPage > 1;
+            btnCommentNext.Enabled = CommentPage < CommentTotalPages;
+
+            var paged = allComments.Skip(startIdx).Take(PageSize).ToList();
+
+            lblNoComments.Visible = total == 0;
+            rptComments.DataSource = paged;
             rptComments.DataBind();
+        }
+
+        protected void btnCommentPrev_Click(object sender, EventArgs e)
+        {
+            if (CommentPage > 1) CommentPage--;
+        }
+
+        protected void btnCommentNext_Click(object sender, EventArgs e)
+        {
+            if (CommentPage < CommentTotalPages) CommentPage++;
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────
@@ -242,4 +313,5 @@ namespace WokFlow.Pages.Sharer
             return stars;
         }
     }
+        
 }
