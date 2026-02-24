@@ -7,9 +7,7 @@
         <!-- Profile Header with Banner -->
         <div class="glass-panel rounded-2xl mb-8">
             <!-- Dark Banner -->
-            <div class="h-[160px] bg-gradient-to-r from-[#1a1a2e] to-[#16213e] relative overflow-hidden rounded-t-2xl">
-                <span class="absolute bottom-3 left-4 text-white/40 text-sm font-medium">Profile</span>
-            </div>
+            <div class="h-[160px] bg-gradient-to-r from-[#1a1a2e] to-[#16213e] relative overflow-hidden rounded-t-2xl"></div>
 
             <!-- Avatar overlapping banner -->
             <div class="relative px-8 pb-8">
@@ -25,10 +23,10 @@
                         <h1 class="text-2xl font-bold text-[#1A1A1A]"><asp:Literal ID="litUserName" runat="server" /></h1>
                         <asp:Literal ID="litRoleBadge" runat="server" />
                     </div>
-                    <asp:Button ID="btnEdit" runat="server" OnClick="btnEdit_Click"
-                        CssClass="px-6 py-2 rounded-full font-bold cursor-pointer border-0 text-sm transition-all" />
+                    <asp:Button ID="btnEdit" runat="server" Text="Edit Profile" OnClick="btnEdit_Click"
+                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl hover:scale-105" />
                     <asp:Button ID="btnSave" runat="server" Text="Save Changes" OnClick="btnSave_Click" Visible="false"
-                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl" />
+                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl hover:scale-105" />
                 </div>
 
                 <!-- Profile Fields -->

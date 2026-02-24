@@ -1,4 +1,4 @@
-﻿/* WokFlow Custom Styles */ 
+﻿/* WokFlow Custom Styles - Ported from React index.html */
 
 body {
     font-family: 'Inter', sans-serif;
@@ -39,11 +39,11 @@ body {
 
 /* Custom utility for the glass effect */
 .glass-panel {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* Hide scrollbar for clean UI */
@@ -65,9 +65,9 @@ html.lenis, html.lenis body {
     scroll-behavior: auto !important;
 }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
-    overscroll-behavior: contain;
-}
+    .lenis.lenis-smooth [data-lenis-prevent] {
+        overscroll-behavior: contain;
+    }
 
 .lenis.lenis-stopped {
     overflow: hidden;

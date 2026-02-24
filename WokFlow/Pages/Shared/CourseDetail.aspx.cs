@@ -128,8 +128,9 @@ namespace WokFlow.Pages.Shared
                     .OrderBy(ch => ch.ChapterOrder)
                     .ToList();
 
+                var chapterIds = chapters.Select(c => c.ChapterId).ToList();
                 var userProgress = db.UserChapterProgress
-                    .Where(p => p.UserId == CurrentUserId && chapters.Select(c => c.ChapterId).Contains(p.ChapterId))
+                    .Where(p => p.UserId == CurrentUserId && chapterIds.Contains(p.ChapterId))
                     .ToList();
 
                 // Build chapter unlock map
@@ -245,9 +246,9 @@ namespace WokFlow.Pages.Shared
             using (var db = new WokFlowContext())
             {
                 var questions = db.Questions
-                    .Where(qs => qs.ChapterId == chapterId)
+                    .Where(qtn => qtn.ChapterId == chapterId)
                     .Include("Answers")
-                    .OrderBy(qs => qs.QuestionOrder)
+                    .OrderBy(qtn => qtn.QuestionOrder)
                     .ToList();
 
                 TotalQuestions = questions.Count;

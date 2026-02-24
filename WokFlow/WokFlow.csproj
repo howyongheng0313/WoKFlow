@@ -122,6 +122,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Images\landing-page.png" />
     <Content Include="Content\Site.css" />
     <Content Include="Controls\AdminNavbar.ascx" />
     <Content Include="Controls\AuthenticatedNavbar.ascx" />

@@ -89,7 +89,8 @@
 
                 <asp:Repeater ID="rptEnrolledCourses" runat="server" OnItemCommand="rptEnrolledCourses_ItemCommand">
                     <ItemTemplate>
-                        <div class="flex items-center gap-4 py-5 border-b border-gray-100 hover:bg-[#FFF8F0] transition-colors px-8">
+                        <div class="flex items-center gap-4 py-5 border-b border-gray-100 hover:bg-[#FFF8F0] transition-colors px-8 cursor-pointer"
+                            onclick="navigateToCourse(event, '<%# Eval("CourseId") %>')">
                             <div class="w-4 h-4 rounded border border-gray-300 shrink-0"></div>
                             <span class="font-bold text-[#1A1A1A] flex-1 min-w-0 truncate"><%# Eval("CourseTitle") %></span>
                             <span class="text-sm text-gray-400 shrink-0 w-28"><%# ((DateTime)Eval("EnrollmentDate")).ToString("yyyy-MM-dd") %></span>
@@ -99,7 +100,7 @@
                                 </div>
                                 <span class="text-sm font-bold text-gray-600 w-10 text-right"><%# Eval("Progress") %> %</span>
                             </div>
-                            <div class="relative shrink-0">
+                            <div class="relative shrink-0" onclick="event.stopPropagation();">
                                 <button type="button" onclick="toggleMenu(this)"
                                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors font-bold text-lg leading-none">&#8942;</button>
                                 <div class="menu-dropdown hidden absolute right-0 top-9 bg-white border border-gray-100 rounded-xl shadow-lg z-10 min-w-[120px] py-1">
@@ -144,5 +145,9 @@
                 });
             }
         });
+
+        function navigateToCourse(event, courseId) {
+            window.location.href = '<%= ResolveUrl("~/Pages/Shared/CourseDetail.aspx") %>?id=' + courseId;
+        }
     </script>
 </asp:Content>
