@@ -38,7 +38,7 @@ Built with ASP.NET Web Forms on .NET Framework 4.8, because sometimes the classi
 ```
 WokFlow-ASPNET/
 ├── WokFlow-ASPNET.sln              # Solution file
-├── Database_02.sql                  # Schema + seed data
+├── Database.sql                  # Schema + seed data
 │
 └── WokFlow-ASPNET/                  # Main web project
     │
@@ -164,7 +164,7 @@ Custom visual effects include particle canvas animations, glass-morphism cards, 
 
 3. **Set up the database**
 
-   Open SQL Server Management Studio (SSMS) and run `Database_02.sql` against a fresh database named `WokFlow`. Then detach the `.mdf` and place it in the project's `App_Data/` folder.
+   Open SQL Server Management Studio (SSMS) and run `Database.sql` against a fresh database named `WokFlow`. Then detach the `.mdf` and place it in the project's `App_Data/` folder.
 
    Alternatively, if `WokFlow.mdf` is already in `App_Data/`, it will auto-attach via the connection string:
    ```
