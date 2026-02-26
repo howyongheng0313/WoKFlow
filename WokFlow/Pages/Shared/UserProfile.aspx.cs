@@ -131,10 +131,10 @@ namespace WokFlow.Pages.Shared
 
         private void LoadUpgradeRequirements(WokFlowContext db)
         {
-            // Requirement 1: Complete at least 10 courses
+            // Requirement 1: Complete at least 3 courses
             int completedCourses = db.Enrollments
                 .Count(en => en.UserId == CurrentUserId && en.Status == "Completed");
-            bool req1Met = completedCourses >= 10;
+            bool req1Met = completedCourses >= 3;
 
             // Requirement 2: Maintain 80%+ quiz average
             var quizScores = db.QuizResults

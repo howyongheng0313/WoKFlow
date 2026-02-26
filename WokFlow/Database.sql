@@ -224,19 +224,19 @@ GO
 -- ────────────────────────────────────────────────────────────
 SET IDENTITY_INSERT Users ON;
 INSERT INTO Users (UserId, Username, Email, PasswordHash, Role, Status, BirthDate, Country, JoinedDate, CreatedAt, UpdatedAt) VALUES
--- Admins
-( 1, N'Jiwoo',          N'jiwoo@wokflow.com',          N'12345', N'ADMIN',   N'Active', '1975-03-22', N'United States', '2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
-( 2, N'Sarah Thompson', N'sarah.thompson@wokflow.com', N'12345', N'ADMIN',   N'Active', '1980-07-15', N'United Kingdom','2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
-( 3, N'Michael Chen',   N'michael.chen@wokflow.com',   N'12345', N'ADMIN',   N'Active', '1978-11-30', N'Singapore',     '2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
+-- Admins (all passwords: 12345, hashed with BCrypt)
+( 1, N'Jiwoo',          N'jiwoo@wokflow.com',          N'$2b$11$EwF2.xLtmFjS40sFqG8vEuHG67l0KFMO2KNopC.t6WXCXloMbYsKO', N'ADMIN',   N'Active', '1975-03-22', N'United States', '2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
+( 2, N'Sarah Thompson', N'sarah.thompson@wokflow.com', N'$2b$11$7EfoK1fRHvoxzs.6dxstvODrFSBZIfPYT3mK4hfJ1qOrRtBXBVovi', N'ADMIN',   N'Active', '1980-07-15', N'United Kingdom','2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
+( 3, N'Michael Chen',   N'michael.chen@wokflow.com',   N'$2b$11$.LnjIpv5e2mTN7ioxsJUZewCX1B9BTLGkd6XciZ9Q7t0supJFTisS', N'ADMIN',   N'Active', '1978-11-30', N'Singapore',     '2024-01-01', '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
 -- Sharers
-( 4, N'How Yong Heng',  N'how@gmail.com',              N'12345', N'SHARER',  N'Active', '1985-04-12', N'Malaysia',      '2024-06-01', '2024-06-01 09:00:00', '2024-06-01 09:00:00'),
-( 5, N'Randy Chee',     N'randy@gmail.com',            N'12345', N'SHARER',  N'Active', '1982-09-08', N'Malaysia',      '2024-04-15', '2024-04-15 10:30:00', '2024-04-15 10:30:00'),
-( 6, N'Yuki Tanaka',    N'yuki.tanaka@gmail.com',      N'12345', N'SHARER',  N'Active', '1988-02-20', N'Japan',         '2024-06-20', '2024-06-20 11:00:00', '2024-06-20 11:00:00'),
+( 4, N'How Yong Heng',  N'how@gmail.com',              N'$2b$11$4SWss2EkQbMDNLFZbg02/O5qEuGD92.vqyIRibfiOuxSDDygbjDvG', N'SHARER',  N'Active', '1985-04-12', N'Malaysia',      '2024-06-01', '2024-06-01 09:00:00', '2024-06-01 09:00:00'),
+( 5, N'Randy Chee',     N'randy@gmail.com',            N'$2b$11$CNnAx.U8d4wuQsZR6jric.rfPSFOT9gs.CT7HCueUqIvC63rXwwPq', N'SHARER',  N'Active', '1982-09-08', N'Malaysia',      '2024-04-15', '2024-04-15 10:30:00', '2024-04-15 10:30:00'),
+( 6, N'Yuki Tanaka',    N'yuki.tanaka@gmail.com',      N'$2b$11$1j5jhMUHWOk.5amNxjYboe8x2GGEZx9b4PoXmw/5EA4dR/w6O7uRm', N'SHARER',  N'Active', '1988-02-20', N'Japan',         '2024-06-20', '2024-06-20 11:00:00', '2024-06-20 11:00:00'),
 -- Learners
-( 7, N'Leong Yu Hang',  N'leong@gmail.com',            N'12345', N'LEARNER', N'Active', '1998-06-14', N'Malaysia',      '2025-01-10', '2025-01-10 14:00:00', '2025-01-10 14:00:00'),
-( 8, N'Kuek Zheng Yu',  N'kuek@gmail.com',             N'12345', N'LEARNER', N'Active', '1995-11-03', N'Malaysia',      '2025-01-15', '2025-01-15 09:30:00', '2025-01-15 09:30:00'),
-( 9, N'Sofia Nguyen',   N'sofia.nguyen@gmail.com',     N'12345', N'LEARNER', N'Active', '2000-03-28', N'Vietnam',       '2025-02-18', '2025-02-18 16:00:00', '2025-02-18 16:00:00'),
-(10, N'David Kim',      N'david.kim@gmail.com',        N'12345', N'LEARNER', N'Active', '1997-08-17', N'South Korea',   '2025-01-22', '2025-01-22 13:00:00', '2025-01-22 13:00:00');
+( 7, N'Leong Yu Hang',  N'leong@gmail.com',            N'$2b$11$BX0g/ZaHYzzgp9hgVSifCOTZYKr5RIbRbOs3Y0T3hjpVHq3SYmvjC', N'LEARNER', N'Active', '1998-06-14', N'Malaysia',      '2025-01-10', '2025-01-10 14:00:00', '2025-01-10 14:00:00'),
+( 8, N'Kuek Zheng Yu',  N'kuek@gmail.com',             N'$2b$11$4JB3xzDk4YwasdQbszOpee5ZV7vlBSLSR80w8hE14mcMrHmQRU2fG', N'LEARNER', N'Active', '1995-11-03', N'Malaysia',      '2025-01-15', '2025-01-15 09:30:00', '2025-01-15 09:30:00'),
+( 9, N'Sofia Nguyen',   N'sofia.nguyen@gmail.com',     N'$2b$11$sC1TTYrO15FXFRvmwnfGaeFkYEfKdBarKef5NofpTGDH.C3XxlGXW', N'LEARNER', N'Active', '2000-03-28', N'Vietnam',       '2025-02-18', '2025-02-18 16:00:00', '2025-02-18 16:00:00'),
+(10, N'David Kim',      N'david.kim@gmail.com',        N'$2b$11$/vplCDjUdwOJqk6vHHVg9.Iftk8mpyAihbfzyW/0UhuNU3Qv5UFSy', N'LEARNER', N'Active', '1997-08-17', N'South Korea',   '2025-01-22', '2025-01-22 13:00:00', '2025-01-22 13:00:00');
 SET IDENTITY_INSERT Users OFF;
 GO
 

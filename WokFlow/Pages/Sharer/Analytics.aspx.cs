@@ -217,7 +217,10 @@ namespace WokFlow.Pages.Sharer
                 .Include("Cuisine");
 
             if (!string.IsNullOrEmpty(cuisineFilter))
+            {
                 courseQuery = courseQuery.Where(c => c.Cuisine.CuisineName == cuisineFilter);
+            }
+               
             if (!string.IsNullOrEmpty(courseFilter))
             {
                 int cId = int.Parse(courseFilter);
@@ -240,7 +243,9 @@ namespace WokFlow.Pages.Sharer
                 .Include("User");
 
             if (!string.IsNullOrEmpty(statusFilter))
+            {
                 query = query.Where(q => q.Status == statusFilter);
+            }
 
             var allResults = query
                 .OrderByDescending(q => q.CompletedDate)

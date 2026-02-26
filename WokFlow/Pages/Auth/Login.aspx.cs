@@ -32,10 +32,9 @@ namespace WokFlow.Pages.Auth
             using (var db = new WokFlowContext())
             {
                 var user = db.Users.FirstOrDefault(u =>
-                    u.Email.ToLower() == email.ToLower() &&
-                    u.PasswordHash == password);
+                    u.Email.ToLower() == email.ToLower());
 
-                if (user == null)
+                if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
                     ShowError("Invalid email or password");
                     return;

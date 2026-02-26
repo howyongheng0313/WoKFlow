@@ -79,8 +79,7 @@ namespace WokFlow.Pages.Sharer
         {
             if (!IsPostBack)
             {
-                if (IsEditing)
-                    LoadCourseForEdit();
+                if (IsEditing) LoadCourseForEdit();
             }
         }
 

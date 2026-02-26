@@ -84,7 +84,7 @@ namespace WokFlow.Pages.Auth
                 {
                     Username = fullName,
                     Email = email,
-                    PasswordHash = password,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                     Role = assignedRole,
                     Status = "Active",
                     Country = countrySelector.SelectedCountry,

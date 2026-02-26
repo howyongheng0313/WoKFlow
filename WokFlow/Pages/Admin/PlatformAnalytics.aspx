@@ -17,8 +17,6 @@
                     <div class="relative w-[120px]">
                         <asp:DropDownList ID="ddlCuisineYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
                             CssClass="w-full h-10 pl-3 pr-8 bg-white/60 backdrop-blur-md border border-white/60 rounded-lg appearance-none text-gray-700 font-medium hover:border-[#FF8C66] text-xs cursor-pointer transition-all shadow-sm">
-                            <asp:ListItem Text="2026" Value="2026" />
-                            <asp:ListItem Text="2025" Value="2025" />
                         </asp:DropDownList>
                     </div>
                 </div>
@@ -34,8 +32,6 @@
                     <div class="relative w-[120px]">
                         <asp:DropDownList ID="ddlRegYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
                             CssClass="w-full h-10 pl-3 pr-8 bg-white/60 backdrop-blur-md border border-white/60 rounded-lg appearance-none text-gray-700 font-medium hover:border-[#FF8C66] text-xs cursor-pointer transition-all shadow-sm">
-                            <asp:ListItem Text="2026" Value="2026" />
-                            <asp:ListItem Text="2025" Value="2025" />
                         </asp:DropDownList>
                     </div>
                 </div>
@@ -52,8 +48,6 @@
                         <div class="relative w-[100px]">
                             <asp:DropDownList ID="ddlRolesYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
                                 CssClass="w-full h-10 pl-3 pr-8 bg-white/60 backdrop-blur-md border border-white/60 rounded-lg appearance-none text-gray-700 font-medium hover:border-[#FF8C66] text-xs cursor-pointer transition-all shadow-sm">
-                                <asp:ListItem Text="2026" Value="2026" />
-                                <asp:ListItem Text="2025" Value="2025" />
                             </asp:DropDownList>
                         </div>
                         <div class="relative w-[100px]">
@@ -98,7 +92,7 @@
             new Chart(document.getElementById('registrationChart'), {
                 type: 'line',
                 data: {
-                    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     datasets: [{
                         data: data.registration,
                         borderColor: '#FF8C66',
@@ -126,7 +120,7 @@
                     labels: data.cuisineLabels,
                     datasets: [{
                         data: data.cuisineValues,
-                        backgroundColor: function(ctx) {
+                        backgroundColor: function (ctx) {
                             var g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
                             g.addColorStop(0, '#FF8C66'); g.addColorStop(1, '#FFB399');
                             return g;
@@ -137,7 +131,7 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw.toLocaleString() + ' Users'; } } } },
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return c.raw.toLocaleString() + ' Users'; } } } },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#6B7280' } },
                         y: { grid: { color: '#F3F4F6' }, ticks: { font: { size: 10 }, color: '#9CA3AF' } }
@@ -167,7 +161,7 @@
             var legendEl = document.getElementById('rolesLegend');
             if (legendEl) {
                 legendEl.innerHTML = '';
-                data.rolesLabels.forEach(function(label, i) {
+                data.rolesLabels.forEach(function (label, i) {
                     legendEl.innerHTML += '<div class="flex items-center gap-3">' +
                         '<div class="w-4 h-4 rounded-full shadow-sm" style="background-color:' + data.rolesColors[i] + '"></div>' +
                         '<span class="text-sm font-medium text-gray-700">' + label + ' (' + data.rolesValues[i] + ')</span></div>';

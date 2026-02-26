@@ -100,7 +100,7 @@
                     <!-- Requirement 1: Complete 10 courses -->
                     <div class="flex items-center gap-3">
                         <asp:Literal ID="litReq1Icon" runat="server" />
-                        <span class="text-gray-700 text-sm">Complete at least 10 courses</span>
+                        <span class="text-gray-700 text-sm">Complete at least 3 courses</span>
                     </div>
                     <!-- Requirement 2: 80%+ quiz average -->
                     <div class="flex items-center gap-3">
