@@ -32,7 +32,9 @@
                 <!-- Chart Card -->
                 <div class="bg-white rounded-2xl p-6 flex-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-gray-100/60">
                     <h3 class="text-lg font-bold text-[#1A1A1A] mb-4">Course Participants</h3>
-                    <canvas id="performanceChart" runat="server" height="300"></canvas>
+                    <div style="position:relative; height:280px;">
+                        <canvas id="performanceChart" runat="server" ClientIDMode="Static"></canvas>
+                    </div>
                 </div>
             </div>
         </asp:Panel>
@@ -169,6 +171,11 @@
 
         var ctx = document.getElementById('performanceChart');
         if (ctx) {
+            var chartCtx = ctx.getContext('2d');
+            var gradient = chartCtx.createLinearGradient(0, 0, 0, ctx.height);
+            gradient.addColorStop(0, 'rgba(255, 140, 102, 0.85)');
+            gradient.addColorStop(1, 'rgba(255, 179, 153, 0.5)');
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -176,34 +183,65 @@
                     datasets: [{
                         label: 'Participants',
                         data: JSON.parse(ctx.getAttribute('data-values') || '[]'),
-                        backgroundColor: 'rgba(255, 140, 102, 0.6)',
-                        borderColor: '#FF8C66',
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(255, 140, 102, 0.3)',
                         borderWidth: 1,
-                        borderRadius: 8
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.7
                     }]
                 },
+                plugins: [{
+                    id: 'datalabels',
+                    afterDatasetsDraw: function (chart) {
+                        var ctx2 = chart.ctx;
+                        chart.data.datasets.forEach(function (dataset, i) {
+                            var meta = chart.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                var value = dataset.data[index];
+                                ctx2.fillStyle = '#FF8C66';
+                                ctx2.font = 'bold 13px Inter, sans-serif';
+                                ctx2.textAlign = 'center';
+                                ctx2.textBaseline = 'bottom';
+                                ctx2.fillText(value, bar.x, bar.y - 6);
+                            });
+                        });
+                    }
+                }],
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                            padding: 10,
+                            cornerRadius: 8,
                             callbacks: {
-                                label: function (ctx) { return ctx.parsed.y + ' participants'; }
+                                label: function (c) { return c.parsed.y + ' participants'; }
                             }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 20 },
-                            grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false, borderDash: [4, 4] }
+                            ticks: { stepSize: 20, color: '#999', font: { size: 12 } },
+                            grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false, borderDash: [4, 4] },
+                            border: { display: false }
                         },
                         x: {
-                            grid: { display: false }
+                            ticks: { color: '#666', font: { size: 12 } },
+                            grid: { display: false },
+                            border: { display: false }
                         }
+                    },
+                    layout: {
+                        padding: { top: 20 }
                     }
                 }
             });
         }
     </script>
 </asp:Content>
+

@@ -19,7 +19,6 @@ namespace WokFlow.Models
         public DbSet<QuizResult> QuizResults { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<SharerRegistration> SharerRegistrations { get; set; }
-        public DbSet<SharerRequest> SharerRequests { get; set; }
         public DbSet<ReportedContent> ReportedContents { get; set; }
         public DbSet<PlatformAnalytics> PlatformAnalytics { get; set; }
         public DbSet<UserChapterProgress> UserChapterProgress { get; set; }

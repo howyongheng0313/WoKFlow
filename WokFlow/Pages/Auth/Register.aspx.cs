@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -76,12 +77,15 @@ namespace WokFlow.Pages.Auth
                     return;
                 }
 
+                // Sharers start as GUEST until admin approves their registration
+                string assignedRole = SelectedRole == "SHARER" ? "GUEST" : SelectedRole;
+
                 var user = new User
                 {
                     Username = fullName,
                     Email = email,
                     PasswordHash = password,
-                    Role = SelectedRole,
+                    Role = assignedRole,
                     Status = "Active",
                     Country = countrySelector.SelectedCountry,
                     JoinedDate = DateTime.UtcNow,
@@ -99,11 +103,20 @@ namespace WokFlow.Pages.Auth
                 // Handle sharer proof document
                 if (SelectedRole == "SHARER" && fuProofDocument.HasFile)
                 {
+                    // Save proof document to Uploads folder
+                    string uploadsDir = Server.MapPath("~/Uploads/ProofDocuments");
+                    if (!Directory.Exists(uploadsDir))
+                        Directory.CreateDirectory(uploadsDir);
+
+                    string fileName = fuProofDocument.FileName;
+                    string savePath = Path.Combine(uploadsDir, fileName);
+                    fuProofDocument.SaveAs(savePath);
+
                     var registration = new SharerRegistration
                     {
                         UserId = user.UserId,
                         RequestDate = DateTime.UtcNow,
-                        ProofDocument = fuProofDocument.FileName,
+                        ProofDocument = "/Uploads/ProofDocuments/" + fileName,
                         Status = "Pending",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
@@ -117,7 +130,11 @@ namespace WokFlow.Pages.Auth
                 Session["UserName"] = user.Username;
                 Session["UserRole"] = user.Role;
 
-                Response.Redirect("~/Pages/Learner/Dashboard.aspx");
+                // GUEST users (pending sharer approval) go to landing page
+                if (user.Role == "GUEST")
+                    Response.Redirect("~/Default.aspx");
+                else
+                    Response.Redirect("~/Pages/Learner/Dashboard.aspx");
             }
         }
 

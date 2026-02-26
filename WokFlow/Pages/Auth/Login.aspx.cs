@@ -13,7 +13,9 @@ namespace WokFlow.Pages.Auth
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
         }
 
         protected void btnSignIn_Click(object sender, EventArgs e)

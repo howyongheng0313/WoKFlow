@@ -62,37 +62,6 @@ namespace WokFlow.Pages.Shared
             set { ViewState["QAnswers"] = value; }
         }
 
-        protected string GetEmbedUrl(string url)
-        {
-            if (string.IsNullOrEmpty(url)) return "";
-
-            if (url.Contains("youtube.com/watch"))
-            {
-                var uri = new Uri(url);
-                var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-                string videoId = query["v"];
-                if (!string.IsNullOrEmpty(videoId))
-                    return "https://www.youtube.com/embed/" + videoId;
-            }
-            if (url.Contains("youtu.be/"))
-            {
-                string videoId = url.Substring(url.LastIndexOf('/') + 1).Split('?')[0];
-                return "https://www.youtube.com/embed/" + videoId;
-            }
-            if (url.Contains("vimeo.com/"))
-            {
-                string videoId = url.Substring(url.LastIndexOf('/') + 1).Split('?')[0];
-                return "https://player.vimeo.com/video/" + videoId;
-            }
-            return url;
-        }
-
-        protected bool IsEmbeddable(string url)
-        {
-            return !string.IsNullOrEmpty(url) &&
-                   (url.Contains("youtube.com") || url.Contains("youtu.be") || url.Contains("vimeo.com"));
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (CourseId == 0)

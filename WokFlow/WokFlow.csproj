@@ -136,8 +136,15 @@
     <Content Include="Controls\LandingNavbar.ascx" />
     <Content Include="Controls\ScoreModal.ascx" />
     <Content Include="Controls\StatsOverview.ascx" />
+    <Content Include="Database.sql" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Images\courses\bibimbap.jpg" />
+    <Content Include="Images\courses\carbonara.jpg" />
+    <Content Include="Images\courses\dim-sum.jpg" />
+    <Content Include="Images\courses\katsu-curry.jpg" />
+    <Content Include="Images\courses\ramen.jpg" />
+    <Content Include="Images\courses\yangzhou-fried-rice.jpg" />
     <Content Include="Pages\Admin\ContentManagement.aspx" />
     <Content Include="Pages\Admin\PlatformAnalytics.aspx" />
     <Content Include="Pages\Admin\SharerRegistration.aspx" />
@@ -417,7 +424,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Images\courses\" />
     <Folder Include="Videos\chapters\" />
   </ItemGroup>
   <ItemGroup>
@@ -425,6 +431,9 @@
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
     <Content Include="Site.Master" />
+    <Content Include="Uploads\ProofDocuments\culinary_workshop_certificate_raj.pdf" />
+    <Content Include="Uploads\ProofDocuments\chef_training_completion_david.pdf" />
+    <Content Include="Uploads\ProofDocuments\professional_training_certificate_emma.pdf" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

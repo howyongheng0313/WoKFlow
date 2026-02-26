@@ -10,24 +10,13 @@
 
                 <!-- Video Player -->
                 <div class="glass-panel rounded-2xl overflow-hidden mb-8">
-                    <% if (IsEmbeddable(CurrentVideoUrl)) { %>
-                        <div class="aspect-video relative">
-                            <iframe src="<%= GetEmbedUrl(CurrentVideoUrl) %>"
-                                class="w-full h-full" frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe>
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 pb-5 pt-10">
-                                <h2 class="text-white font-bold text-lg leading-tight"><%= CurrentChapterTitle %></h2>
-                                <p class="text-white/70 text-sm mt-1 line-clamp-2"><%= CurrentChapterDescription %></p>
-                            </div>
-                        </div>
-                    <% } else if (!string.IsNullOrEmpty(CurrentVideoUrl)) { %>
+                    <% if (!string.IsNullOrEmpty(CurrentVideoUrl)) { %>
                         <div class="aspect-video bg-black relative">
                             <video class="w-full h-full" controls>
-                                <source src="<%= CurrentVideoUrl %>" />
+                                <source src="<%= CurrentVideoUrl %>" type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 pb-5 pt-10">
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 pb-5 pt-10 pointer-events-none">
                                 <h2 class="text-white font-bold text-lg leading-tight"><%= CurrentChapterTitle %></h2>
                                 <p class="text-white/70 text-sm mt-1 line-clamp-2"><%= CurrentChapterDescription %></p>
                             </div>

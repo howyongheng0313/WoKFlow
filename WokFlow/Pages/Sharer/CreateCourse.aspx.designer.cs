@@ -87,6 +87,15 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.Label lblCurrentImage;
 
         /// <summary>
+        /// lblStep1Error control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblStep1Error;
+
+        /// <summary>
         /// btnNext control.
         /// </summary>
         /// <remarks>
@@ -114,13 +123,13 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.Repeater rptChapters;
 
         /// <summary>
-        /// btnShowAddChapter control.
+        /// btnAddChapterNew control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnShowAddChapter;
+        protected global::System.Web.UI.WebControls.Button btnAddChapterNew;
 
         /// <summary>
         /// txtChapterTitle control.
@@ -150,15 +159,6 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.FileUpload fuChapterVideo;
 
         /// <summary>
-        /// txtVideoUrl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtVideoUrl;
-
-        /// <summary>
         /// lblQuizChapter control.
         /// </summary>
         /// <remarks>
@@ -168,13 +168,49 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.Label lblQuizChapter;
 
         /// <summary>
-        /// ddlQuizChapter control.
+        /// pnlQuizPagination control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlQuizChapter;
+        protected global::System.Web.UI.WebControls.Panel pnlQuizPagination;
+
+        /// <summary>
+        /// btnPrevQuestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnPrevQuestion;
+
+        /// <summary>
+        /// lblQuestionPager control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblQuestionPager;
+
+        /// <summary>
+        /// btnNextQuestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnNextQuestion;
+
+        /// <summary>
+        /// btnDeleteQuestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteQuestion;
 
         /// <summary>
         /// pnlNoQuestions control.
@@ -195,22 +231,13 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.Panel pnlQuizQuestions;
 
         /// <summary>
-        /// rptQuizPreview control.
+        /// hdnCorrectAnswer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater rptQuizPreview;
-
-        /// <summary>
-        /// pnlAddQuestion control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlAddQuestion;
+        protected global::System.Web.UI.WebControls.HiddenField hdnCorrectAnswer;
 
         /// <summary>
         /// txtQuestionText control.
@@ -258,22 +285,13 @@ namespace WokFlow.Pages.Sharer
         protected global::System.Web.UI.WebControls.TextBox txtAnswer4;
 
         /// <summary>
-        /// ddlCorrectAnswer control.
+        /// btnAddQuestion control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCorrectAnswer;
-
-        /// <summary>
-        /// btnToggleQuestion control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnToggleQuestion;
+        protected global::System.Web.UI.WebControls.Button btnAddQuestion;
 
         /// <summary>
         /// btnBack control.

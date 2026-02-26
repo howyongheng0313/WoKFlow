@@ -12,8 +12,7 @@ namespace WokFlow.Pages.Admin
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-                BindData();
+            BindData();
         }
 
         private void BindData()
@@ -77,7 +76,7 @@ namespace WokFlow.Pages.Admin
                             var userToDemote = db.Users.Find(reg.UserId);
                             if (userToDemote != null)
                             {
-                                userToDemote.Role = "LEARNER";
+                                userToDemote.Role = "GUEST";
                                 userToDemote.UpdatedAt = DateTime.UtcNow;
                             }
                         }

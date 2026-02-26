@@ -9,27 +9,24 @@ using WokFlow.Models;
 
 namespace WokFlow.Pages.Sharer
 {
-    [Serializable]
     public class AnswerEntry
     {
         public string Text { get; set; } = "";
         public bool IsCorrect { get; set; }
     }
 
-    [Serializable]
     public class QuestionEntry
     {
         public string QuestionText { get; set; } = "";
         public List<AnswerEntry> Answers { get; set; } = new List<AnswerEntry>();
     }
 
-    [Serializable]
     public class ChapterEntry
     {
-        public string Title { get; set; } = "";
+        public string Title { get; set; } = "Untitled Chapter";
         public string Description { get; set; } = "";
         public string VideoUrl { get; set; } = "";
-        public QuestionEntry Question { get; set; } = new QuestionEntry();
+        public List<QuestionEntry> Questions { get; set; } = new List<QuestionEntry>();
     }
 
     public partial class CreateCoursePage : SharerPage
@@ -50,7 +47,6 @@ namespace WokFlow.Pages.Sharer
             get { return ChapterList.Count; }
         }
 
-        // Stores the uploaded image path between Step 1 -> Step 2 postbacks
         private string TempImagePath
         {
             get { return ViewState["TempImagePath"] as string; }
@@ -62,6 +58,22 @@ namespace WokFlow.Pages.Sharer
             get { return ViewState["Chapters"] as List<ChapterEntry> ?? new List<ChapterEntry>(); }
             set { ViewState["Chapters"] = value; }
         }
+
+        private int SelectedChapterIndex
+        {
+            get { return ViewState["SelectedChapterIdx"] != null ? (int)ViewState["SelectedChapterIdx"] : 0; }
+            set { ViewState["SelectedChapterIdx"] = value; }
+        }
+
+        private int CurrentQuestionIndex
+        {
+            get { return ViewState["CurrentQIdx"] != null ? (int)ViewState["CurrentQIdx"] : 0; }
+            set { ViewState["CurrentQIdx"] = value; }
+        }
+
+        // =====================================================================
+        // Page Lifecycle
+        // =====================================================================
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -90,10 +102,10 @@ namespace WokFlow.Pages.Sharer
                 {
                     lblCurrentImage.Text = "Current image: " + course.ImageUrl;
                     lblCurrentImage.Visible = true;
-                    TempImagePath = course.ImageUrl; // keep existing image unless replaced
+                    TempImagePath = course.ImageUrl;
                 }
 
-                // Load chapters with video and quiz data
+                // Load chapters with ALL questions
                 var chapterData = db.Chapters
                     .Where(ch => ch.CourseId == editId)
                     .OrderBy(ch => ch.ChapterOrder)
@@ -109,38 +121,100 @@ namespace WokFlow.Pages.Sharer
                         VideoUrl = ch.VideoUrl ?? ""
                     };
 
-                    var firstQ = db.Questions.FirstOrDefault(q => q.ChapterId == ch.ChapterId);
-                    if (firstQ != null)
+                    var allQs = db.Questions
+                        .Where(q => q.ChapterId == ch.ChapterId)
+                        .OrderBy(q => q.QuestionOrder)
+                        .ToList();
+
+                    foreach (var dbQ in allQs)
                     {
                         var answers = db.Answers
-                            .Where(a => a.QuestionId == firstQ.QuestionId)
+                            .Where(a => a.QuestionId == dbQ.QuestionId)
                             .OrderBy(a => a.AnswerOrder)
                             .ToList();
 
-                        entry.Question = new QuestionEntry
+                        entry.Questions.Add(new QuestionEntry
                         {
-                            QuestionText = firstQ.QuestionText,
+                            QuestionText = dbQ.QuestionText,
                             Answers = answers.Select(a => new AnswerEntry
                             {
                                 Text = a.AnswerText,
                                 IsCorrect = a.IsCorrect
                             }).ToList()
-                        };
+                        });
                     }
 
                     entries.Add(entry);
                 }
 
                 ChapterList = entries;
-                rptChapters.DataSource = entries;
-                rptChapters.DataBind();
+                SelectedChapterIndex = 0;
+                CurrentQuestionIndex = 0;
             }
         }
 
-        // -- Step Navigation --------------------------------------------------
+        // =====================================================================
+        // Step 1 Validation
+        // =====================================================================
+
+        private bool ValidateStep1(out string errorMessage)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(txtTitle.Text))
+                errors.Add("Course title is required.");
+
+            if (string.IsNullOrWhiteSpace(txtDescription.Text))
+                errors.Add("Course description is required.");
+
+            if (string.IsNullOrEmpty(ddlCuisine.SelectedValue))
+                errors.Add("Please select a cuisine type.");
+
+            int difficulty;
+            if (!int.TryParse(hdnDifficulty.Value, out difficulty) || difficulty < 1 || difficulty > 5)
+                errors.Add("Please select a difficulty rating (1-5).");
+
+            if (string.IsNullOrWhiteSpace(txtDuration.Text))
+                errors.Add("Course duration is required.");
+
+            bool hasNewImage = fuCourseImage.HasFile;
+            bool hasExistingImage = !string.IsNullOrEmpty(TempImagePath);
+
+            if (!hasNewImage && !hasExistingImage)
+            {
+                errors.Add("Please upload a course image.");
+            }
+            else if (hasNewImage)
+            {
+                string ext = Path.GetExtension(fuCourseImage.FileName).ToLowerInvariant();
+                if (ext != ".jpg" && ext != ".jpeg" && ext != ".png")
+                    errors.Add("Course image must be a JPG or PNG file.");
+
+                if (fuCourseImage.PostedFile.ContentLength > 10 * 1024 * 1024)
+                    errors.Add("Course image must be 10 MB or smaller.");
+            }
+
+            errorMessage = string.Join("<br/>", errors);
+            return errors.Count == 0;
+        }
+
+        // =====================================================================
+        // Step Navigation
+        // =====================================================================
+
         protected void btnNext_Click(object sender, EventArgs e)
         {
-            // Upload image NOW while the file data is still available (multi-step form limitation)
+            string validationError;
+            if (!ValidateStep1(out validationError))
+            {
+                lblStep1Error.Text = validationError;
+                lblStep1Error.Visible = true;
+                return;
+            }
+
+            lblStep1Error.Visible = false;
+
+            // Upload image NOW while the file data is still available
             if (fuCourseImage.HasFile)
             {
                 string uploadDir = Server.MapPath("~/Images/courses/");
@@ -156,28 +230,44 @@ namespace WokFlow.Pages.Sharer
             CurrentStep = 2;
             pnlStep1.Visible = false;
             pnlStep2.Visible = true;
-            BindChapters();
+
+            // Seed one default chapter on first visit to Step 2
+            if (ChapterList.Count == 0)
+            {
+                var chapters = new List<ChapterEntry> { new ChapterEntry() };
+                ChapterList = chapters;
+                SelectedChapterIndex = 0;
+                CurrentQuestionIndex = 0;
+            }
+
+            LoadChapterIntoForm(SelectedChapterIndex);
+            BindStep2();
         }
 
         protected void btnBack_Click(object sender, EventArgs e)
         {
+            SaveCurrentFormToChapter();
             CurrentStep = 1;
             pnlStep1.Visible = true;
             pnlStep2.Visible = false;
         }
 
-        // -- Add Chapter placeholder (shows form / adds default chapter) ------
-        protected void btnAddChapterPlaceholder_Click(object sender, EventArgs e)
-        {
-            string title = txtChapterTitle.Text.Trim();
-            if (string.IsNullOrEmpty(title))
-            {
-                // If no title entered yet, create a placeholder
-                title = "Untitled Chapter";
-            }
+        // =====================================================================
+        // Helper Methods
+        // =====================================================================
 
-            // Gather video URL from text field (file upload is optional enhancement)
-            string videoUrl = txtVideoUrl.Text.Trim();
+        private void SaveCurrentFormToChapter()
+        {
+            var chapters = ChapterList;
+            if (chapters.Count == 0) return;
+
+            int idx = SelectedChapterIndex;
+            if (idx < 0 || idx >= chapters.Count) return;
+
+            string title = txtChapterTitle.Text.Trim();
+            chapters[idx].Title = string.IsNullOrEmpty(title) ? "Untitled Chapter" : title;
+            chapters[idx].Description = txtChapterDescription.Text.Trim();
+            // Handle video file upload
             if (fuChapterVideo.HasFile)
             {
                 string uploadDir = Server.MapPath("~/Videos/chapters/");
@@ -187,118 +277,272 @@ namespace WokFlow.Pages.Sharer
                 string safeFileName = DateTime.UtcNow.Ticks + "_" +
                     Path.GetFileName(fuChapterVideo.FileName);
                 fuChapterVideo.SaveAs(Path.Combine(uploadDir, safeFileName));
-                videoUrl = "/Videos/chapters/" + safeFileName;
+                chapters[idx].VideoUrl = "/Videos/chapters/" + safeFileName;
             }
 
-            // Build quiz entry from the question form (if visible and filled)
-            var questionEntry = new QuestionEntry();
-            if (pnlAddQuestion.Visible && !string.IsNullOrEmpty(txtQuestionText.Text.Trim()))
-            {
-                int correctIdx = int.Parse(ddlCorrectAnswer.SelectedValue) - 1;
-                var answerTexts = new[]
-                {
-                    txtAnswer1.Text.Trim(),
-                    txtAnswer2.Text.Trim(),
-                    txtAnswer3.Text.Trim(),
-                    txtAnswer4.Text.Trim()
-                };
-                questionEntry = new QuestionEntry
-                {
-                    QuestionText = txtQuestionText.Text.Trim(),
-                    Answers = answerTexts.Select((text, i) => new AnswerEntry
-                    {
-                        Text = text,
-                        IsCorrect = i == correctIdx
-                    }).ToList()
-                };
-            }
-
-            var entry = new ChapterEntry
-            {
-                Title = title,
-                Description = txtChapterDescription.Text.Trim(),
-                VideoUrl = videoUrl,
-                Question = questionEntry
-            };
-
-            var chapters = ChapterList;
-            chapters.Add(entry);
             ChapterList = chapters;
-
-            // Clear inputs
-            txtChapterTitle.Text = "";
-            txtChapterDescription.Text = "";
-            txtVideoUrl.Text = "";
-            txtQuestionText.Text = "";
-            txtAnswer1.Text = txtAnswer2.Text = txtAnswer3.Text = txtAnswer4.Text = "";
-            ddlCorrectAnswer.SelectedIndex = 0;
-            pnlAddQuestion.Visible = false;
-
-            BindChapters();
         }
 
-        // -- Toggle Add Question form visibility ------------------------------
-        protected void btnToggleQuestion_Click(object sender, EventArgs e)
-        {
-            pnlAddQuestion.Visible = !pnlAddQuestion.Visible;
-            BindChapters(); // rebind to keep chapter list visible
-        }
-
-        // -- Helper: bind chapters and update quiz chapter dropdown -----------
-        private void BindChapters()
+        private void LoadChapterIntoForm(int index)
         {
             var chapters = ChapterList;
-            rptChapters.DataSource = chapters;
+            if (chapters.Count == 0) return;
+            if (index < 0 || index >= chapters.Count) index = 0;
+
+            var ch = chapters[index];
+            txtChapterTitle.Text = ch.Title == "Untitled Chapter" ? "" : ch.Title;
+            txtChapterDescription.Text = ch.Description;
+        }
+
+        private void BindStep2()
+        {
+            var chapters = ChapterList;
+            int selIdx = SelectedChapterIndex;
+
+            // Clamp selection
+            if (selIdx >= chapters.Count && chapters.Count > 0)
+            {
+                selIdx = chapters.Count - 1;
+                SelectedChapterIndex = selIdx;
+            }
+
+            // Bind chapter card list with selection state
+            rptChapters.DataSource = chapters.Select((ch, i) => new
+            {
+                Title = string.IsNullOrEmpty(ch.Title) ? "Untitled Chapter" : ch.Title,
+                IsSelected = (i == selIdx),
+                Index = i
+            }).ToList();
             rptChapters.DataBind();
 
-            // Update quiz chapter dropdown
-            ddlQuizChapter.Items.Clear();
-            ddlQuizChapter.Items.Add(new System.Web.UI.WebControls.ListItem("Select chapter...", ""));
-            for (int i = 0; i < chapters.Count; i++)
-            {
-                ddlQuizChapter.Items.Add(new System.Web.UI.WebControls.ListItem(
-                    chapters[i].Title, (i + 1).ToString()));
-            }
+            // Quiz header label
+            string selTitle = chapters.Count > 0
+                ? (string.IsNullOrEmpty(chapters[selIdx].Title) ? "Untitled Chapter" : chapters[selIdx].Title)
+                : "Untitled Chapter";
+            lblQuizChapter.Text = selTitle;
 
-            // Update label
-            if (chapters.Count > 0)
-            {
-                lblQuizChapter.Text = chapters.Last().Title;
-            }
-            else
-            {
-                lblQuizChapter.Text = "Untitled Chapter";
-            }
-
-            // Show/hide quiz question list
-            var questionsWithContent = chapters
-                .Where(c => c.Question != null && !string.IsNullOrEmpty(c.Question.QuestionText))
-                .Select(c => c.Question)
-                .ToList();
-
-            if (questionsWithContent.Count > 0)
-            {
-                pnlNoQuestions.Visible = false;
-                pnlQuizQuestions.Visible = true;
-                rptQuizPreview.DataSource = questionsWithContent;
-                rptQuizPreview.DataBind();
-            }
-            else
+            // Quiz question display
+            if (chapters.Count == 0)
             {
                 pnlNoQuestions.Visible = true;
                 pnlQuizQuestions.Visible = false;
+                pnlQuizPagination.Visible = false;
+                return;
+            }
+
+            var questions = chapters[selIdx].Questions;
+            if (questions == null || questions.Count == 0)
+            {
+                pnlNoQuestions.Visible = true;
+                pnlQuizQuestions.Visible = false;
+                pnlQuizPagination.Visible = false;
+                return;
+            }
+
+            pnlNoQuestions.Visible = false;
+            pnlQuizQuestions.Visible = true;
+            pnlQuizPagination.Visible = true;
+
+            int qIdx = CurrentQuestionIndex;
+            if (qIdx >= questions.Count) qIdx = questions.Count - 1;
+            if (qIdx < 0) qIdx = 0;
+            CurrentQuestionIndex = qIdx;
+
+            var currentQ = questions[qIdx];
+
+            // Populate question form with current question data
+            txtQuestionText.Text = currentQ.QuestionText;
+            txtAnswer1.Text = currentQ.Answers.Count > 0 ? currentQ.Answers[0].Text : "";
+            txtAnswer2.Text = currentQ.Answers.Count > 1 ? currentQ.Answers[1].Text : "";
+            txtAnswer3.Text = currentQ.Answers.Count > 2 ? currentQ.Answers[2].Text : "";
+            txtAnswer4.Text = currentQ.Answers.Count > 3 ? currentQ.Answers[3].Text : "";
+
+            int correctIdx = currentQ.Answers.FindIndex(a => a.IsCorrect);
+            hdnCorrectAnswer.Value = correctIdx >= 0 ? correctIdx.ToString() : "0";
+
+            // Pagination label
+            lblQuestionPager.Text = string.Format("Question {0} of {1}", qIdx + 1, questions.Count);
+
+            // Prev/Next states
+            btnPrevQuestion.Enabled = (qIdx > 0);
+            btnNextQuestion.Enabled = (qIdx < questions.Count - 1);
+        }
+
+        // =====================================================================
+        // Chapter Event Handlers
+        // =====================================================================
+
+        protected void rptChapters_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "SelectChapter")
+            {
+                SaveCurrentQuestionToChapter();
+                SaveCurrentFormToChapter();
+
+                int idx = int.Parse(e.CommandArgument.ToString());
+                SelectedChapterIndex = idx;
+                CurrentQuestionIndex = 0;
+
+                LoadChapterIntoForm(idx);
+                BindStep2();
             }
         }
 
-        // -- Legacy handler kept for compatibility ----------------------------
         protected void btnAddChapter_Click(object sender, EventArgs e)
         {
-            btnAddChapterPlaceholder_Click(sender, e);
+            SaveCurrentQuestionToChapter();
+            SaveCurrentFormToChapter();
+
+            var chapters = ChapterList;
+            chapters.Add(new ChapterEntry());
+            ChapterList = chapters;
+
+            int newIdx = chapters.Count - 1;
+            SelectedChapterIndex = newIdx;
+            CurrentQuestionIndex = 0;
+
+            // Clear form for new blank chapter
+            txtChapterTitle.Text = "";
+            txtChapterDescription.Text = "";
+
+            // Clear question form
+            txtQuestionText.Text = "";
+            txtAnswer1.Text = txtAnswer2.Text = txtAnswer3.Text = txtAnswer4.Text = "";
+            hdnCorrectAnswer.Value = "0";
+
+            BindStep2();
         }
 
-        // -- Save Course ------------------------------------------------------
+        // =====================================================================
+        // Quiz Event Handlers
+        // =====================================================================
+
+        private void SaveCurrentQuestionToChapter()
+        {
+            var chapters = ChapterList;
+            if (chapters.Count == 0) return;
+
+            int chIdx = SelectedChapterIndex;
+            if (chIdx < 0 || chIdx >= chapters.Count) return;
+
+            var questions = chapters[chIdx].Questions;
+            int qIdx = CurrentQuestionIndex;
+            if (questions.Count == 0 || qIdx < 0 || qIdx >= questions.Count) return;
+
+            // Update the current question with form values
+            int correctIdx = 0;
+            int.TryParse(hdnCorrectAnswer.Value, out correctIdx);
+
+            var answerTexts = new[]
+            {
+                txtAnswer1.Text.Trim(),
+                txtAnswer2.Text.Trim(),
+                txtAnswer3.Text.Trim(),
+                txtAnswer4.Text.Trim()
+            };
+
+            questions[qIdx].QuestionText = txtQuestionText.Text.Trim();
+            questions[qIdx].Answers = answerTexts.Select((text, i) => new AnswerEntry
+            {
+                Text = text,
+                IsCorrect = (i == correctIdx)
+            }).ToList();
+
+            ChapterList = chapters;
+        }
+
+        protected void btnAddQuestion_Click(object sender, EventArgs e)
+        {
+            // Save current question edits first
+            SaveCurrentQuestionToChapter();
+            SaveCurrentFormToChapter();
+
+            var chapters = ChapterList;
+            int chIdx = SelectedChapterIndex;
+
+            // Create a new blank question
+            var newQ = new QuestionEntry
+            {
+                QuestionText = "",
+                Answers = new List<AnswerEntry>
+                {
+                    new AnswerEntry { Text = "", IsCorrect = true },
+                    new AnswerEntry { Text = "", IsCorrect = false },
+                    new AnswerEntry { Text = "", IsCorrect = false },
+                    new AnswerEntry { Text = "", IsCorrect = false }
+                }
+            };
+
+            chapters[chIdx].Questions.Add(newQ);
+            ChapterList = chapters;
+
+            // Navigate to the new question
+            CurrentQuestionIndex = chapters[chIdx].Questions.Count - 1;
+
+            // Clear question form for new entry
+            txtQuestionText.Text = "";
+            txtAnswer1.Text = txtAnswer2.Text = txtAnswer3.Text = txtAnswer4.Text = "";
+            hdnCorrectAnswer.Value = "0";
+
+            BindStep2();
+        }
+
+        protected void btnDeleteQuestion_Click(object sender, EventArgs e)
+        {
+            var chapters = ChapterList;
+            int chIdx = SelectedChapterIndex;
+            int qIdx = CurrentQuestionIndex;
+
+            if (chapters[chIdx].Questions.Count == 0) return;
+
+            chapters[chIdx].Questions.RemoveAt(qIdx);
+            ChapterList = chapters;
+
+            // Clamp index
+            int newCount = chapters[chIdx].Questions.Count;
+            if (CurrentQuestionIndex >= newCount && newCount > 0)
+                CurrentQuestionIndex = newCount - 1;
+            else if (newCount == 0)
+                CurrentQuestionIndex = 0;
+
+            // Clear form if no questions remain
+            if (newCount == 0)
+            {
+                txtQuestionText.Text = "";
+                txtAnswer1.Text = txtAnswer2.Text = txtAnswer3.Text = txtAnswer4.Text = "";
+                hdnCorrectAnswer.Value = "0";
+            }
+
+            BindStep2();
+        }
+
+        protected void btnPrevQuestion_Click(object sender, EventArgs e)
+        {
+            SaveCurrentQuestionToChapter();
+            if (CurrentQuestionIndex > 0)
+                CurrentQuestionIndex--;
+            BindStep2();
+        }
+
+        protected void btnNextQuestion_Click(object sender, EventArgs e)
+        {
+            SaveCurrentQuestionToChapter();
+            var chapters = ChapterList;
+            int maxIdx = chapters[SelectedChapterIndex].Questions.Count - 1;
+            if (CurrentQuestionIndex < maxIdx)
+                CurrentQuestionIndex++;
+            BindStep2();
+        }
+
+        // =====================================================================
+        // Save Course
+        // =====================================================================
+
         protected void btnSaveCourse_Click(object sender, EventArgs e)
         {
+            SaveCurrentQuestionToChapter();
+            SaveCurrentFormToChapter();
+
             using (var db = new WokFlowContext())
             {
                 Course course;
@@ -325,12 +569,10 @@ namespace WokFlow.Pages.Sharer
                 course.Title = txtTitle.Text.Trim();
                 course.Description = txtDescription.Text.Trim();
 
-                // Parse cuisine - handle empty placeholder value
                 int cuisineId;
                 if (int.TryParse(ddlCuisine.SelectedValue, out cuisineId))
                     course.CuisineId = cuisineId;
 
-                // Difficulty from hidden field (star rating)
                 int difficulty;
                 if (int.TryParse(hdnDifficulty.Value, out difficulty))
                     course.Difficulty = difficulty;
@@ -340,7 +582,6 @@ namespace WokFlow.Pages.Sharer
                 course.Duration = txtDuration.Text.Trim();
                 course.UpdatedAt = DateTime.UtcNow;
 
-                // Apply uploaded image path (saved during btnNext_Click)
                 if (!string.IsNullOrEmpty(TempImagePath))
                     course.ImageUrl = TempImagePath;
 
@@ -364,7 +605,7 @@ namespace WokFlow.Pages.Sharer
                     db.SaveChanges();
                 }
 
-                // Save chapters, videos, questions and answers
+                // Save chapters with multiple questions each
                 var chapters = ChapterList;
                 for (int i = 0; i < chapters.Count; i++)
                 {
@@ -381,28 +622,31 @@ namespace WokFlow.Pages.Sharer
                     db.Chapters.Add(ch);
                     db.SaveChanges(); // flush to get ChapterId
 
-                    var qEntry = chapters[i].Question;
-                    if (qEntry != null && !string.IsNullOrEmpty(qEntry.QuestionText))
+                    var questionList = chapters[i].Questions ?? new List<QuestionEntry>();
+                    for (int q = 0; q < questionList.Count; q++)
                     {
+                        var qEntry = questionList[q];
+                        if (string.IsNullOrEmpty(qEntry.QuestionText)) continue;
+
                         var question = new Question
                         {
                             ChapterId = ch.ChapterId,
                             QuestionText = qEntry.QuestionText,
-                            QuestionOrder = 1,
+                            QuestionOrder = q + 1,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow
                         };
                         db.Questions.Add(question);
                         db.SaveChanges(); // flush to get QuestionId
 
-                        for (int j = 0; j < qEntry.Answers.Count; j++)
+                        for (int a = 0; a < qEntry.Answers.Count; a++)
                         {
                             db.Answers.Add(new Answer
                             {
                                 QuestionId = question.QuestionId,
-                                AnswerText = qEntry.Answers[j].Text,
-                                IsCorrect = qEntry.Answers[j].IsCorrect,
-                                AnswerOrder = j + 1,
+                                AnswerText = qEntry.Answers[a].Text,
+                                IsCorrect = qEntry.Answers[a].IsCorrect,
+                                AnswerOrder = a + 1,
                                 CreatedAt = DateTime.UtcNow
                             });
                         }
@@ -412,20 +656,6 @@ namespace WokFlow.Pages.Sharer
 
                 Response.Redirect("~/Pages/Shared/MyCourses.aspx?tab=created");
             }
-        }
-
-        // -- View Helpers -----------------------------------------------------
-        protected string GetQuizPreview(object questionObj)
-        {
-            var q = questionObj as QuestionEntry;
-            if (q == null || string.IsNullOrEmpty(q.QuestionText))
-                return "<span class='text-gray-400'>No quiz</span>";
-
-            string preview = q.QuestionText.Length > 50
-                ? q.QuestionText.Substring(0, 50) + "..."
-                : q.QuestionText;
-            return "<span class='text-green-600 font-medium'>Quiz: </span>" +
-                   HttpUtility.HtmlEncode(preview);
         }
     }
 }

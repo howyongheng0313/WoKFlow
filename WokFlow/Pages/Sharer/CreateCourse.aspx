@@ -73,11 +73,18 @@
                     <!-- Upload Course Image -->
                     <div class="space-y-1.5">
                         <label class="text-sm text-gray-700 font-medium">Upload Course Image</label>
-                        <label for="<%= fuCourseImage.ClientID %>"
+                        <label id="lblImageDropZone" for="<%= fuCourseImage.ClientID %>"
                             class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl bg-white/40 cursor-pointer hover:border-[#FF8C66]/60 transition-colors">
-                            <i data-lucide="upload" style="width:28px;height:28px;color:#9CA3AF;"></i>
-                            <span class="text-xs text-gray-400 mt-2">Supports JPG, PNG (Max 10MB)</span>
+                            <div id="imageUploadDefault" class="flex flex-col items-center">
+                                <i data-lucide="upload" style="width:28px;height:28px;color:#9CA3AF;"></i>
+                                <span class="text-xs text-gray-400 mt-2">Supports JPG, PNG (Max 10MB)</span>
+                            </div>
+                            <div id="imageUploadPreview" class="hidden flex-col items-center justify-center gap-2 w-full h-full px-4">
+                                <img id="imagePreviewThumb" src="" alt="Preview" class="max-h-16 max-w-[120px] rounded-lg object-cover" />
+                                <span id="imageFileName" class="text-xs text-gray-600 font-medium truncate max-w-full"></span>
+                            </div>
                         </label>
+                        <button type="button" id="btnClearImage" class="hidden mt-1 text-xs text-red-400 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-0 underline">Remove image</button>
                         <asp:FileUpload ID="fuCourseImage" runat="server" CssClass="hidden" />
                         <asp:Label ID="lblCurrentImage" runat="server" Visible="false"
                             CssClass="text-xs text-gray-500" />
@@ -96,6 +103,10 @@
                 </div>
             </div>
 
+            <!-- Validation Error -->
+            <asp:Label ID="lblStep1Error" runat="server" Visible="false"
+                CssClass="block mt-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600" />
+
             <!-- Next Button -->
             <div class="flex justify-end mt-8">
                 <asp:Button ID="btnNext" runat="server" Text="Next ›" OnClick="btnNext_Click"
@@ -112,20 +123,27 @@
                     <!-- Chapter List Header -->
                     <h3 class="text-lg font-bold text-[#1A1A1A]">Chapters (<%= ChapterCount %>)</h3>
 
-                    <!-- Existing Chapters -->
-                    <asp:Repeater ID="rptChapters" runat="server">
+                    <!-- Chapter Cards (clickable, with selection state) -->
+                    <asp:Repeater ID="rptChapters" runat="server" OnItemCommand="rptChapters_ItemCommand">
                         <ItemTemplate>
-                            <div class="border-2 border-[#FF8C66]/40 rounded-xl px-4 py-3 mb-2 bg-white/60">
-                                <span class="text-sm font-medium text-[#1A1A1A]">&bull; <%# Eval("Title") %></span>
+                            <div class="mb-2">
+                                <asp:Button ID="btnSelectChapter" runat="server"
+                                    CommandName="SelectChapter"
+                                    CommandArgument='<%# Eval("Index") %>'
+                                    Text='<%# "● " + Eval("Title") %>'
+                                    CssClass='<%# (bool)Eval("IsSelected")
+                                        ? "w-full text-left px-4 py-3 border-2 border-[#FF8C66] rounded-xl bg-white/80 text-sm font-semibold text-[#FF6B4A] cursor-pointer"
+                                        : "w-full text-left px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/60 text-sm font-medium text-[#1A1A1A] cursor-pointer hover:border-[#FF8C66]/50 transition-colors" %>'
+                                    UseSubmitBehavior="false" />
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
 
                     <!-- Add New Chapter Button -->
-                    <asp:Button ID="btnShowAddChapter" runat="server" Text="+ Add New Chapter" OnClick="btnAddChapterPlaceholder_Click"
+                    <asp:Button ID="btnAddChapterNew" runat="server" Text="+ Add New Chapter" OnClick="btnAddChapter_Click"
                         CssClass="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm font-medium text-gray-500 bg-transparent cursor-pointer hover:border-[#FF8C66]/60 hover:text-[#FF8C66] transition-colors" />
 
-                    <!-- Chapter Form -->
+                    <!-- Chapter Form (always visible, edits the selected chapter) -->
                     <div class="space-y-4 mt-4">
                         <div class="space-y-1.5">
                             <label class="text-sm text-gray-700 font-medium">Chapter Name</label>
@@ -140,15 +158,20 @@
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm text-gray-700 font-medium">Upload Video</label>
-                            <label for="<%= fuChapterVideo.ClientID %>"
+                            <label id="lblVideoDropZone" for="<%= fuChapterVideo.ClientID %>"
                                 class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl bg-white/40 cursor-pointer hover:border-[#FF8C66]/60 transition-colors">
-                                <i data-lucide="upload" style="width:28px;height:28px;color:#9CA3AF;"></i>
-                                <span class="text-xs text-gray-400 mt-2">Click to upload video</span>
+                                <div id="videoUploadDefault" class="flex flex-col items-center">
+                                    <i data-lucide="upload" style="width:28px;height:28px;color:#9CA3AF;"></i>
+                                    <span class="text-xs text-gray-400 mt-2">Supports MP4 (Max 50MB)</span>
+                                </div>
+                                <div id="videoUploadPreview" class="hidden flex-col items-center justify-center gap-1">
+                                    <i data-lucide="film" style="width:28px;height:28px;color:#FF8C66;"></i>
+                                    <span id="videoFileName" class="text-xs text-gray-600 font-medium truncate max-w-full"></span>
+                                    <span id="videoFileSize" class="text-xs text-gray-400"></span>
+                                </div>
                             </label>
-                            <asp:FileUpload ID="fuChapterVideo" runat="server" CssClass="hidden" />
-                            <!-- Fallback: video URL input -->
-                            <asp:TextBox ID="txtVideoUrl" runat="server" placeholder="Or paste video URL (e.g. https://youtube.com/...)"
-                                CssClass="w-full h-10 px-4 bg-white/60 border border-gray-200 rounded-xl text-xs mt-1 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                            <asp:FileUpload ID="fuChapterVideo" runat="server" CssClass="hidden" accept=".mp4" />
+                            <button type="button" id="btnClearVideo" class="hidden mt-1 text-xs text-red-400 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-0 underline">Remove video</button>
                         </div>
                     </div>
                 </div>
@@ -158,69 +181,86 @@
                     <!-- Quiz Header -->
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-[#1A1A1A]">Create Quiz</h3>
-                        <span class="text-xs text-gray-400">For: <asp:Label ID="lblQuizChapter" runat="server" Text="Untitled Chapter" CssClass="text-gray-400" /></span>
+                        <span class="text-xs text-gray-400 px-3 py-1 bg-white/60 rounded-full border border-gray-200">
+                            For: <asp:Label ID="lblQuizChapter" runat="server" Text="Untitled Chapter" CssClass="font-medium text-gray-600" />
+                        </span>
                     </div>
 
-                    <!-- Chapter Selector for Quiz -->
-                    <asp:DropDownList ID="ddlQuizChapter" runat="server"
-                        CssClass="w-full h-12 px-4 bg-white/60 border border-gray-200 rounded-xl text-sm appearance-none"
-                        AutoPostBack="false">
-                        <asp:ListItem Text="Select chapter..." Value="" />
-                    </asp:DropDownList>
-
-                    <!-- Quiz Questions Area -->
-                    <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center min-h-[160px] bg-white/30">
-                        <asp:Panel ID="pnlNoQuestions" runat="server">
-                            <div class="flex flex-col items-center gap-2">
-                                <i data-lucide="help-circle" style="width:32px;height:32px;color:#D1D5DB;"></i>
-                                <p class="text-sm text-gray-400 text-center">No questions added for this chapter yet.</p>
+                    <!-- Question Pagination -->
+                    <asp:Panel ID="pnlQuizPagination" runat="server" Visible="false">
+                        <div class="flex items-center justify-between bg-white/60 border border-gray-200 rounded-xl px-4 py-2">
+                            <asp:Button ID="btnPrevQuestion" runat="server" Text="‹"
+                                OnClick="btnPrevQuestion_Click"
+                                CssClass="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 border-0 bg-transparent cursor-pointer font-bold text-lg"
+                                UseSubmitBehavior="false" />
+                            <asp:Label ID="lblQuestionPager" runat="server" Text="Question 1 of 1"
+                                CssClass="text-sm font-medium text-gray-600" />
+                            <div class="flex items-center gap-1">
+                                <asp:Button ID="btnNextQuestion" runat="server" Text="›"
+                                    OnClick="btnNextQuestion_Click"
+                                    CssClass="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 border-0 bg-transparent cursor-pointer font-bold text-lg"
+                                    UseSubmitBehavior="false" />
+                                <asp:Button ID="btnDeleteQuestion" runat="server" Text="✕"
+                                    OnClick="btnDeleteQuestion_Click"
+                                    CssClass="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 border-0 bg-transparent cursor-pointer text-sm"
+                                    UseSubmitBehavior="false"
+                                    OnClientClick="return confirm('Delete this question?');" />
                             </div>
-                        </asp:Panel>
+                        </div>
+                    </asp:Panel>
 
-                        <!-- Quiz question list (shown when questions exist) -->
-                        <asp:Panel ID="pnlQuizQuestions" runat="server" Visible="false" CssClass="w-full space-y-3">
-                            <asp:Repeater ID="rptQuizPreview" runat="server">
-                                <ItemTemplate>
-                                    <div class="bg-white/60 rounded-lg p-3 text-sm text-gray-700">
-                                        <span class="font-medium">Q<%# Container.ItemIndex + 1 %>:</span> <%# Eval("QuestionText") %>
-                                    </div>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </asp:Panel>
-                    </div>
+                    <!-- No Questions Placeholder -->
+                    <asp:Panel ID="pnlNoQuestions" runat="server">
+                        <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center min-h-[120px] bg-white/30">
+                            <i data-lucide="help-circle" style="width:28px;height:28px;color:#D1D5DB;"></i>
+                            <p class="text-sm text-gray-400 mt-2 text-center">No questions yet. Click "+ Add Question" below.</p>
+                        </div>
+                    </asp:Panel>
 
-                    <!-- Add Question Form (collapsible) -->
-                    <asp:Panel ID="pnlAddQuestion" runat="server" Visible="false" CssClass="space-y-3 border border-gray-200 rounded-xl p-4 bg-white/40">
+                    <!-- Question Edit Form (visible when questions exist) -->
+                    <asp:Panel ID="pnlQuizQuestions" runat="server" Visible="false"
+                        CssClass="space-y-3 border border-gray-200 rounded-xl p-4 bg-white/40">
+                        <asp:HiddenField ID="hdnCorrectAnswer" runat="server" Value="0" />
+
                         <div class="space-y-1.5">
                             <label class="text-xs text-gray-700 font-medium">Question</label>
-                            <asp:TextBox ID="txtQuestionText" runat="server" placeholder="Enter your quiz question"
+                            <asp:TextBox ID="txtQuestionText" runat="server" placeholder="Type your question here..."
                                 CssClass="w-full h-10 px-4 bg-white/60 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <asp:TextBox ID="txtAnswer1" runat="server" placeholder="Answer option 1"
-                                CssClass="h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm" />
-                            <asp:TextBox ID="txtAnswer2" runat="server" placeholder="Answer option 2"
-                                CssClass="h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm" />
-                            <asp:TextBox ID="txtAnswer3" runat="server" placeholder="Answer option 3"
-                                CssClass="h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm" />
-                            <asp:TextBox ID="txtAnswer4" runat="server" placeholder="Answer option 4"
-                                CssClass="h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm" />
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <label class="text-xs font-medium text-gray-700 shrink-0">Correct answer:</label>
-                            <asp:DropDownList ID="ddlCorrectAnswer" runat="server"
-                                CssClass="h-9 px-3 bg-white/60 border border-gray-200 rounded-xl text-xs">
-                                <asp:ListItem Text="Answer 1" Value="1" />
-                                <asp:ListItem Text="Answer 2" Value="2" />
-                                <asp:ListItem Text="Answer 3" Value="3" />
-                                <asp:ListItem Text="Answer 4" Value="4" />
-                            </asp:DropDownList>
+
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-700 font-medium uppercase tracking-wide">Answers</label>
+
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="correctAnswer" value="0" class="correct-radio w-4 h-4 accent-[#FF8C66] cursor-pointer"
+                                    onclick="setCorrectAnswer(0)" />
+                                <asp:TextBox ID="txtAnswer1" runat="server" placeholder="Answer option 1"
+                                    CssClass="flex-1 h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="correctAnswer" value="1" class="correct-radio w-4 h-4 accent-[#FF8C66] cursor-pointer"
+                                    onclick="setCorrectAnswer(1)" />
+                                <asp:TextBox ID="txtAnswer2" runat="server" placeholder="Answer option 2"
+                                    CssClass="flex-1 h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="correctAnswer" value="2" class="correct-radio w-4 h-4 accent-[#FF8C66] cursor-pointer"
+                                    onclick="setCorrectAnswer(2)" />
+                                <asp:TextBox ID="txtAnswer3" runat="server" placeholder="Answer option 3"
+                                    CssClass="flex-1 h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="radio" name="correctAnswer" value="3" class="correct-radio w-4 h-4 accent-[#FF8C66] cursor-pointer"
+                                    onclick="setCorrectAnswer(3)" />
+                                <asp:TextBox ID="txtAnswer4" runat="server" placeholder="Answer option 4"
+                                    CssClass="flex-1 h-10 px-3 bg-white/60 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
+                            </div>
                         </div>
                     </asp:Panel>
 
                     <!-- Add Question Button -->
-                    <asp:Button ID="btnToggleQuestion" runat="server" Text="+ Add Question" OnClick="btnToggleQuestion_Click"
-                        CssClass="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm font-medium text-gray-500 bg-transparent cursor-pointer hover:border-[#FF8C66]/60 hover:text-[#FF8C66] transition-colors" />
+                    <asp:Button ID="btnAddQuestion" runat="server" Text="+ Add Question" OnClick="btnAddQuestion_Click"
+                        CssClass="w-full py-3 border-2 border-dashed border-[#FF8C66]/40 rounded-xl text-sm font-medium text-[#FF8C66] bg-transparent cursor-pointer hover:border-[#FF8C66] hover:bg-[#FF8C66]/5 transition-colors" />
                 </div>
             </div>
 
@@ -234,7 +274,7 @@
         </asp:Panel>
     </div>
 
-    <!-- Star Rating Script -->
+    <!-- Star Rating Script (Step 1) -->
     <script>
         function setRating(value) {
             var hidden = document.getElementById('<%= hdnDifficulty.ClientID %>');
@@ -245,13 +285,183 @@
                 star.style.color = sv <= value ? '#FF8C66' : '#D1D5DB';
             });
         }
-        // Initialize stars on page load
+
+        // Radio button correct-answer sync (Step 2)
+        function setCorrectAnswer(index) {
+            var hidden = document.getElementById('<%= hdnCorrectAnswer.ClientID %>');
+            if (hidden) hidden.value = index;
+        }
+
+        function initCorrectAnswerRadios() {
+            var hidden = document.getElementById('<%= hdnCorrectAnswer.ClientID %>');
+            if (!hidden) return;
+            var correctIdx = parseInt(hidden.value, 10) || 0;
+            var radios = document.querySelectorAll('input.correct-radio');
+            radios.forEach(function (r) {
+                r.checked = (parseInt(r.value, 10) === correctIdx);
+            });
+        }
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function () {
-            var hidden = document.getElementById('<%= hdnDifficulty.ClientID %>');
-            if (hidden) {
-                setRating(parseInt(hidden.value) || 1);
+            // Star rating init
+            var diffHidden = document.getElementById('<%= hdnDifficulty.ClientID %>');
+            if (diffHidden) {
+                setRating(parseInt(diffHidden.value) || 1);
             }
+            // Radio button init
+            initCorrectAnswerRadios();
         });
+    </script>
+
+    <!-- File Upload Preview & Drag-and-Drop -->
+    <script>
+    (function () {
+        var imageInputId = '<%= fuCourseImage.ClientID %>';
+        var videoInputId = '<%= fuChapterVideo.ClientID %>';
+
+        var imageInput = document.getElementById(imageInputId);
+        var videoInput = document.getElementById(videoInputId);
+
+        var imageDropZone = document.getElementById('lblImageDropZone');
+        var videoDropZone = document.getElementById('lblVideoDropZone');
+
+        var imageDefault = document.getElementById('imageUploadDefault');
+        var imagePreview = document.getElementById('imageUploadPreview');
+        var imageThumb = document.getElementById('imagePreviewThumb');
+        var imageNameSpan = document.getElementById('imageFileName');
+        var btnClearImage = document.getElementById('btnClearImage');
+
+        var videoDefault = document.getElementById('videoUploadDefault');
+        var videoPreview = document.getElementById('videoUploadPreview');
+        var videoNameSpan = document.getElementById('videoFileName');
+        var videoSizeSpan = document.getElementById('videoFileSize');
+        var btnClearVideo = document.getElementById('btnClearVideo');
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Course Image: onchange
+        if (imageInput) {
+            imageInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    var file = this.files[0];
+                    imageNameSpan.textContent = file.name;
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        imageThumb.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    imageDefault.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                    imagePreview.style.display = 'flex';
+                    btnClearImage.classList.remove('hidden');
+
+                    imageDropZone.classList.remove('border-gray-300');
+                    imageDropZone.classList.add('border-[#FF8C66]');
+                }
+            });
+        }
+
+        // Chapter Video: onchange
+        if (videoInput) {
+            videoInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    var file = this.files[0];
+                    videoNameSpan.textContent = file.name;
+                    videoSizeSpan.textContent = formatSize(file.size);
+
+                    videoDefault.classList.add('hidden');
+                    videoPreview.classList.remove('hidden');
+                    videoPreview.style.display = 'flex';
+                    btnClearVideo.classList.remove('hidden');
+
+                    videoDropZone.classList.remove('border-gray-300');
+                    videoDropZone.classList.add('border-[#FF8C66]');
+
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            });
+        }
+
+        // Clear handlers
+        if (btnClearImage) {
+            btnClearImage.addEventListener('click', function (e) {
+                e.preventDefault();
+                imageInput.value = '';
+                imageThumb.src = '';
+                imageNameSpan.textContent = '';
+                imageDefault.classList.remove('hidden');
+                imagePreview.classList.add('hidden');
+                imagePreview.style.display = '';
+                btnClearImage.classList.add('hidden');
+                imageDropZone.classList.add('border-gray-300');
+                imageDropZone.classList.remove('border-[#FF8C66]');
+            });
+        }
+
+        if (btnClearVideo) {
+            btnClearVideo.addEventListener('click', function (e) {
+                e.preventDefault();
+                videoInput.value = '';
+                videoNameSpan.textContent = '';
+                videoSizeSpan.textContent = '';
+                videoDefault.classList.remove('hidden');
+                videoPreview.classList.add('hidden');
+                videoPreview.style.display = '';
+                btnClearVideo.classList.add('hidden');
+                videoDropZone.classList.add('border-gray-300');
+                videoDropZone.classList.remove('border-[#FF8C66]');
+            });
+        }
+
+        // Drag-and-drop
+        function setupDragDrop(dropZone, fileInput) {
+            if (!dropZone || !fileInput) return;
+
+            ['dragenter', 'dragover'].forEach(function (evt) {
+                dropZone.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('border-[#FF8C66]', 'bg-[#FF8C66]/5');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function (evt) {
+                dropZone.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('bg-[#FF8C66]/5');
+                    if (evt === 'dragleave') {
+                        dropZone.classList.remove('border-[#FF8C66]');
+                        dropZone.classList.add('border-gray-300');
+                    }
+                });
+            });
+
+            dropZone.addEventListener('drop', function (e) {
+                var files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    try {
+                        var dt = new DataTransfer();
+                        dt.items.add(files[0]);
+                        fileInput.files = dt.files;
+                    } catch (err) {
+                        fileInput.files = files;
+                    }
+                    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        }
+
+        setupDragDrop(imageDropZone, imageInput);
+        setupDragDrop(videoDropZone, videoInput);
+    })();
     </script>
 
     <script>lucide.createIcons();</script>

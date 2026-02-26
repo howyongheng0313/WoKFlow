@@ -40,7 +40,9 @@
                             <tr class="border-b border-gray-100 hover:bg-[#FFF8F0] transition-colors">
                                 <td class="py-5 px-8 text-sm font-medium text-[#1A1A1A]"><%# Eval("Username") %></td>
                                 <td class="py-5 px-8 text-sm text-gray-500"><%# ((DateTime)Eval("RequestDate")).ToString("yyyy-MM-dd") %></td>
-                                <td class="py-5 px-8 text-sm text-[#FF8C66] font-medium"><%# Eval("ProofDocument") %></td>
+                                <td class="py-5 px-8 text-sm text-[#FF8C66] font-medium">
+                                    <a href="javascript:void(0)" onclick="openPdfViewer('<%# Eval("ProofDocument") %>')" class="hover:underline cursor-pointer"><%# System.IO.Path.GetFileName(Eval("ProofDocument").ToString()) %></a>
+                                </td>
                                 <td class="py-5 px-8 text-sm text-gray-500"><%# Eval("Status") %></td>
                                 <td class="py-5 px-4">
                                     <div class="relative inline-block">
@@ -69,6 +71,22 @@
         </div>
     </div>
 
+    <!-- PDF Viewer Modal -->
+    <div id="pdfModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closePdfViewer()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[900px] h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 id="pdfModalTitle" class="text-lg font-semibold text-[#1A1A1A]">Proof of Skills</h3>
+                <button onclick="closePdfViewer()" class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex-1 p-2">
+                <iframe id="pdfFrame" class="w-full h-full rounded-lg border border-gray-100" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
     <script>
         function openKebabMenu(e, btn) {
             e.stopPropagation();
@@ -84,6 +102,28 @@
         }
         document.addEventListener('click', function () {
             document.querySelectorAll('.kebab-menu').forEach(function (m) { m.classList.add('hidden'); });
+        });
+
+        function openPdfViewer(fileName) {
+            var modal = document.getElementById('pdfModal');
+            var frame = document.getElementById('pdfFrame');
+            var title = document.getElementById('pdfModalTitle');
+            title.textContent = fileName.split('/').pop();
+            frame.src = fileName;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePdfViewer() {
+            var modal = document.getElementById('pdfModal');
+            var frame = document.getElementById('pdfFrame');
+            modal.classList.add('hidden');
+            frame.src = '';
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closePdfViewer();
         });
     </script>
 </asp:Content>

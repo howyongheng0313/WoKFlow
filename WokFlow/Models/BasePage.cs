@@ -35,7 +35,7 @@ namespace WokFlow.Models
             base.OnInit(e);
             if (!IsLoggedIn)
             {
-                Response.Redirect("~/Pages/Login.aspx");
+                Response.Redirect("~/Pages/Auth/Login.aspx");
             }
         }
     }
@@ -67,7 +67,7 @@ namespace WokFlow.Models
     }
 
     // Base page for sharer-only pages. Redirects if not SHARER role.
-    public class SharerPage : AuthenticatedPage
+    public class SharerPage : LearnerPage
     {
         protected override void OnInit(EventArgs e)
         {
