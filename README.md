@@ -12,7 +12,6 @@ Built with ASP.NET Web Forms on .NET Framework 4.8, because sometimes the classi
 ![GSAP](https://img.shields.io/badge/GSAP-Animations-88ce02?style=flat-square)
 ![SQL Server](https://img.shields.io/badge/SQL_Server-LocalDB-red?style=flat-square)
 
----
 
 ## ✨ Features at a Glance
 
@@ -31,7 +30,6 @@ Built with ASP.NET Web Forms on .NET Framework 4.8, because sometimes the classi
 - 🎓 Sharer registration with proof document uploads (50MB limit)
 - 📈 Platform-wide analytics with monthly trend data
 
----
 
 ## 🏗️ Architecture
 
@@ -40,6 +38,7 @@ Built with ASP.NET Web Forms on .NET Framework 4.8, because sometimes the classi
 ```
 WokFlow-ASPNET/
 ├── WokFlow-ASPNET.sln              # Solution file
+├── Database_02.sql                  # Schema + seed data
 │
 └── WokFlow-ASPNET/                  # Main web project
     │
@@ -111,11 +110,11 @@ BasePage
 ```
 Users ─────────────┬──────────────── Enrollments ──── Courses
   │                │                     │               │
-  │                │              UserChapterProgress     │
+  │                │              UserChapterProgress    │
   │                │                     │               │
-  │           QuizResults           Chapters ────── Questions
-  │                                                    │
-  ├── Comments                                      Answers
+  │           QuizResults           Chapters  ────── Questions
+  │                                                      │
+  ├── Comments                                        Answers
   ├── SharerRegistrations
   └── ReportedContent                            Cuisines
                                                     │
@@ -140,7 +139,6 @@ No build tools, no bundlers — just vibes and CDNs:
 
 Custom visual effects include particle canvas animations, glass-morphism cards, ambient glow effects, and click-spark interactions.
 
----
 
 ## 🚀 Getting Started
 
@@ -197,7 +195,7 @@ All seed accounts use the password: **`12345`**
 
 The seed data includes **4 cuisines**, **6 courses**, **27 chapters**, **54 quiz questions** (with 216 answers), **11 enrollments**, **34 chapter progress records**, **29 quiz results**, **11 comments**, and **10 reported content entries**.
 
----
+
 
 ## 🔧 Configuration
 
@@ -210,7 +208,7 @@ Key settings in `Web.config`:
 | Database | `(LocalDb)\MSSQLLocalDB` | Auto-attached from App_Data |
 | Target framework | `.NET 4.8` | |
 
----
+
 
 ## 📂 Conventions
 
@@ -221,7 +219,7 @@ Key settings in `Web.config`:
 - **Authentication:** Pure session-based (`Session["UserId"]`, `Session["UserRole"]`, `Session["UserName"]`)
 - **Passwords:** Hashed with BCrypt
 
----
+
 
 ## 🍜 What's on the Menu (Seed Courses)
 
@@ -234,7 +232,7 @@ Key settings in `Web.config`:
 | 5 | Dim Sum Essentials: Dumplings & Buns | Chinese | ⭐⭐⭐⭐⭐ | 90 min |
 | 6 | Homemade Ramen Workshop | Japanese | ⭐⭐⭐⭐⭐ | 120 min |
 
----
+
 
 ## 📄 License
 
