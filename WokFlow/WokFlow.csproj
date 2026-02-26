@@ -123,6 +123,10 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Images\landing-page.png" />
+    <Content Include="Content\Images\randy.jpeg" />
+    <Content Include="Content\Images\yongheng.jpeg" />
+    <Content Include="Content\Images\yuhang.jpeg" />
+    <Content Include="Content\Images\zhengyu.png" />
     <Content Include="Content\Site.css" />
     <Content Include="Controls\AdminNavbar.ascx" />
     <Content Include="Controls\AuthenticatedNavbar.ascx" />
@@ -137,7 +141,6 @@
     <Content Include="Pages\Admin\ContentManagement.aspx" />
     <Content Include="Pages\Admin\PlatformAnalytics.aspx" />
     <Content Include="Pages\Admin\SharerRegistration.aspx" />
-    <Content Include="Pages\Admin\SharerRequests.aspx" />
     <Content Include="Pages\Admin\UserManagement.aspx" />
     <Content Include="Pages\Auth\Login.aspx" />
     <Content Include="Pages\Auth\Logout.aspx" />
@@ -320,13 +323,6 @@
     <Compile Include="Pages\Admin\SharerRegistration.aspx.designer.cs">
       <DependentUpon>SharerRegistration.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Admin\SharerRequests.aspx.cs">
-      <DependentUpon>SharerRequests.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Pages\Admin\SharerRequests.aspx.designer.cs">
-      <DependentUpon>SharerRequests.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Pages\Admin\UserManagement.aspx.cs">
       <DependentUpon>UserManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -421,6 +417,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Images\courses\" />
+    <Folder Include="Videos\chapters\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

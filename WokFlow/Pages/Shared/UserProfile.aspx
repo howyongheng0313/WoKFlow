@@ -7,7 +7,8 @@
         <!-- Profile Header with Banner -->
         <div class="glass-panel rounded-2xl mb-8">
             <!-- Dark Banner -->
-            <div class="h-[160px] bg-gradient-to-r from-[#1a1a2e] to-[#16213e] relative overflow-hidden rounded-t-2xl"></div>
+            <div class="h-[160px] bg-gradient-to-r from-[#1a1a2e] to-[#16213e] relative overflow-hidden rounded-t-2xl">
+                </div>
 
             <!-- Avatar overlapping banner -->
             <div class="relative px-8 pb-8">
@@ -23,10 +24,10 @@
                         <h1 class="text-2xl font-bold text-[#1A1A1A]"><asp:Literal ID="litUserName" runat="server" /></h1>
                         <asp:Literal ID="litRoleBadge" runat="server" />
                     </div>
-                    <asp:Button ID="btnEdit" runat="server" Text="Edit Profile" OnClick="btnEdit_Click"
-                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl hover:scale-105" />
+                    <asp:Button ID="btnEdit" runat="server" OnClick="btnEdit_Click"
+                        CssClass="px-6 py-2 rounded-full font-bold cursor-pointer border-0 text-sm transition-all" />
                     <asp:Button ID="btnSave" runat="server" Text="Save Changes" OnClick="btnSave_Click" Visible="false"
-                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl hover:scale-105" />
+                        CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl" />
                 </div>
 
                 <!-- Profile Fields -->
@@ -91,7 +92,7 @@
 
         <!-- Upgrade Section (Learner only) -->
         <asp:Panel ID="pnlUpgrade" runat="server" Visible="false">
-            <div class="glass-panel rounded-2xl p-8 mb-8 border border-gray-200" >
+            <div class="glass-panel rounded-2xl p-8 mb-8">
                 <h2 class="text-xl font-bold text-[#1A1A1A] mb-2">Upgrade to Sharer</h2>
                 <p class="text-gray-500 text-sm mb-6">Requirements to become a Professional Sharer:</p>
 
@@ -106,18 +107,12 @@
                         <asp:Literal ID="litReq2Icon" runat="server" />
                         <span class="text-gray-700 text-sm">Maintain 80% + quiz average</span>
                     </div>
-                    <!-- Requirement 3: Active 30+ days -->
-                    <div class="flex items-center gap-3">
-                        <asp:Literal ID="litReq3Icon" runat="server" />
-                        <span class="text-gray-700 text-sm">Active for 30+ days</span>
-                    </div>
                 </div>
 
                 <div class="flex justify-end">
-                    <asp:Button ID="btnUpgrade" runat="server" Text="Request Upgrade" OnClick="btnUpgrade_Click"
+                    <asp:Button ID="btnUpgrade" runat="server" Text="Upgrade to Sharer" OnClick="btnUpgrade_Click"
                         CssClass="px-8 py-3 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white rounded-full font-bold cursor-pointer border-0 shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl" />
                 </div>
-                <asp:Label ID="lblUpgradeStatus" runat="server" CssClass="block mt-4 text-sm" />
             </div>
         </asp:Panel>
 

@@ -9,33 +9,40 @@ using WokFlow.Models;
 
 namespace WokFlow.Pages.Admin
 {
-    public partial class UserManagement : System.Web.UI.Page
+    public partial class UserManagement : AdminPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-                BindData();
+            BindData();
         }
 
         private void BindData()
         {
             using (var db = new WokFlowContext())
             {
-                DateTime thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-
                 var query = db.Users.Where(u => u.Role != "ADMIN").AsQueryable();
+
+                string search = txtSearch.Text.Trim();
+                if (!string.IsNullOrEmpty(search))
+                    query = query.Where(u => u.Username.Contains(search));
+
+                string role = ddlRole.SelectedValue;
+                if (!string.IsNullOrEmpty(role))
+                    query = query.Where(u => u.Role == role);
+
+                string status = ddlStatus.SelectedValue;
+                if (!string.IsNullOrEmpty(status))
+                    query = query.Where(u => u.Status == status);
 
                 var users = query.OrderBy(u => u.Username).ToList();
 
+                var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
                 dashStats.Items = new List<StatItemData>
-        {
-            new StatItemData { Icon = "users", Label = "Total Users", Value = db.Users.Count(u => u.Role != "ADMIN").ToString() },
-            
-            // 2. Use the pre-calculated variable here
-            new StatItemData { Icon = "user-plus", Label = "New Users", Value = db.Users.Count(u => u.JoinedDate >= thirtyDaysAgo).ToString() },
-
-            new StatItemData { Icon = "clock", Label = "Pending Requests", Value = db.SharerRequests.Count(r => r.Status == "Pending").ToString() },
-            new StatItemData { Icon = "user-x", Label = "Banned", Value = db.Users.Count(u => u.Status == "Banned").ToString() }
-        };
+                {
+                    new StatItemData { Icon = "users", Label = "Total Users", Value = db.Users.Count(u => u.Role != "ADMIN").ToString() },
+                    new StatItemData { Icon = "user-plus", Label = "New Users", Value = db.Users.Count(u => u.JoinedDate >= thirtyDaysAgo).ToString() },
+                    new StatItemData { Icon = "user-x", Label = "Banned", Value = db.Users.Count(u => u.Status == "Banned").ToString() }
+                };
 
                 rptUsers.DataSource = users;
                 rptUsers.DataBind();

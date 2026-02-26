@@ -51,6 +51,7 @@ namespace WokFlow.Pages.Sharer
                 SetupTabs();
                 PopulateFilterDropdowns();
             }
+            PopulateChapterDropdown(ddlQuizCourse.SelectedValue);
             LoadTabData();
         }
 
@@ -66,7 +67,7 @@ namespace WokFlow.Pages.Sharer
             using (var db = new WokFlowContext())
             {
                 var courses = db.Courses
-                    .Where(c => c.CreatorId == CurrentUserId && c.Status != "Deleted")
+                    .Where(c => c.CreatorId == CurrentUserId && c.Status == "Active")
                     .OrderBy(c => c.Title)
                     .Select(c => new { c.CourseId, c.Title })
                     .ToList();
@@ -94,7 +95,7 @@ namespace WokFlow.Pages.Sharer
             using (var db = new WokFlowContext())
             {
                 var myCourseIds = db.Courses
-                    .Where(c => c.CreatorId == CurrentUserId && c.Status != "Deleted")
+                    .Where(c => c.CreatorId == CurrentUserId && c.Status == "Active")
                     .Select(c => c.CourseId)
                     .ToList();
 
@@ -126,7 +127,7 @@ namespace WokFlow.Pages.Sharer
             }
         }
 
-        // ── Performance ────────────────────────────────────────────────────────
+        // Performance
         private void LoadPerformance(WokFlowContext db, List<int> myCourseIds)
         {
             DateTime? startDate = null;
@@ -170,11 +171,45 @@ namespace WokFlow.Pages.Sharer
             txtEndDate.Text = "";
         }
 
-        // ── Quiz Results ───────────────────────────────────────────────────────
+        private void PopulateChapterDropdown(string courseId)
+        {
+            string previouslySelected = ddlQuizChapter.SelectedValue;
+
+            ddlQuizChapter.Items.Clear();
+            ddlQuizChapter.Items.Add(new ListItem("All Chapters", ""));
+
+            if (string.IsNullOrEmpty(courseId))
+            {
+                ddlQuizChapter.Enabled = false;
+                return;
+            }
+
+            using (var db = new WokFlowContext())
+            {
+                int cId = int.Parse(courseId);
+                var chapters = db.Chapters
+                    .Where(ch => ch.CourseId == cId)
+                    .OrderBy(ch => ch.ChapterOrder)
+                    .Select(ch => new { ch.ChapterId, ch.ChapterOrder, ch.Title })
+                    .ToList();
+
+                foreach (var ch in chapters)
+                    ddlQuizChapter.Items.Add(new ListItem($"Chapter {ch.ChapterOrder} - {ch.Title}", ch.ChapterId.ToString()));
+            }
+
+            var existingItem = ddlQuizChapter.Items.FindByValue(previouslySelected);
+            if (existingItem != null)
+                ddlQuizChapter.SelectedValue = previouslySelected;
+
+            ddlQuizChapter.Enabled = true;
+        }
+
+        // Quiz Results
         private void LoadQuizResults(WokFlowContext db, List<int> myCourseIds)
         {
             string cuisineFilter = ddlQuizCuisine.SelectedValue;
             string courseFilter = ddlQuizCourse.SelectedValue;
+            string chapterFilter = ddlQuizChapter.SelectedValue;
             string statusFilter = ddlQuizStatus.SelectedValue;
 
             var courseQuery = db.Courses
@@ -190,10 +225,15 @@ namespace WokFlow.Pages.Sharer
             }
 
             var filteredCourseIds = courseQuery.Select(c => c.CourseId).ToList();
-            var chapterIds = db.Chapters
-                .Where(ch => filteredCourseIds.Contains(ch.CourseId))
-                .Select(ch => ch.ChapterId)
-                .ToList();
+            var chapterQuery = db.Chapters.Where(ch => filteredCourseIds.Contains(ch.CourseId));
+
+            if (!string.IsNullOrEmpty(chapterFilter))
+            {
+                int chId = int.Parse(chapterFilter);
+                chapterQuery = chapterQuery.Where(ch => ch.ChapterId == chId);
+            }
+
+            var chapterIds = chapterQuery.Select(ch => ch.ChapterId).ToList();
 
             var query = db.QuizResults
                 .Where(q => chapterIds.Contains(q.ChapterId))
@@ -242,7 +282,7 @@ namespace WokFlow.Pages.Sharer
             if (QuizPage < QuizTotalPages) QuizPage++;
         }
 
-        // ── Comments ───────────────────────────────────────────────────────────
+        // Comments
         private void LoadComments(WokFlowContext db, List<int> myCourseIds)
         {
             string courseFilter = ddlCommentCourse.SelectedValue;
@@ -300,7 +340,7 @@ namespace WokFlow.Pages.Sharer
             if (CommentPage < CommentTotalPages) CommentPage++;
         }
 
-        // ── Helpers ────────────────────────────────────────────────────────────
+        // Helpers
         protected string GetScoreWidth(object score) => $"style=\"width:{score}%\"";
 
         protected string RenderStars(int rating)

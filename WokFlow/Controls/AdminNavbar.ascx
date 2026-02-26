@@ -24,10 +24,6 @@
                         class="block w-full px-4 py-3 text-left text-sm font-medium no-underline <%= CurrentPage == "UserManagement" ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50" %>">
                         User Control Panel
                     </a>
-                    <a href="<%: ResolveUrl("~/Pages/Admin/SharerRequests.aspx") %>"
-                        class="block w-full px-4 py-3 text-left text-sm font-medium no-underline <%= CurrentPage == "SharerRequests" ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50" %>">
-                        Sharer Requests
-                    </a>
                     <a href="<%: ResolveUrl("~/Pages/Admin/SharerRegistration.aspx") %>"
                         class="block w-full px-4 py-3 text-left text-sm font-medium no-underline <%= CurrentPage == "SharerRegistration" ? "bg-gray-100 text-gray-900" : "text-gray-700 hover:bg-gray-50" %>">
                         Sharer Registration

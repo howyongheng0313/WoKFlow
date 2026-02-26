@@ -3,16 +3,18 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <div class="max-w-[1400px] mx-auto px-6 md:px-12 py-8 mt-4">
-        <!-- Stats -->
+        <!-- Overview Statistic -->
         <uc:DashboardStats ID="dashStats" runat="server" CssClass="mb-8" />
 
         <!-- Filters -->
         <div class="flex gap-3 mb-4">
             <div class="relative flex-1 max-w-[300px]">
+                <!-- Search bar with icon-->
                 <asp:TextBox ID="txtSearch" runat="server" placeholder="Search by course or reporter..."
                     CssClass="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/20 focus:border-[#FF8C66]" />
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </div>
+            <!-- Dropdown list (Status) -->
             <asp:DropDownList ID="ddlStatus" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Filter_Changed"
                 CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none">
                 <asp:ListItem Text="Pending" Value="Pending" />

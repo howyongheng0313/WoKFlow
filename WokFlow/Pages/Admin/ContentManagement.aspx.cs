@@ -13,8 +13,7 @@ namespace WokFlow.Pages.Admin
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-                BindData();
+            BindData();
         }
 
         private void BindData()
@@ -73,7 +72,7 @@ namespace WokFlow.Pages.Admin
                         var courseToBan = db.Courses.Find(report.CourseId);
                         if (courseToBan != null)
                         {
-                            courseToBan.Status = "Deleted";
+                            courseToBan.Status = "Banned";
                             courseToBan.UpdatedAt = DateTime.UtcNow;
                         }
                         break;

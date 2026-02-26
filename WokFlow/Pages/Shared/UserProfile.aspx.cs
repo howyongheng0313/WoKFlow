@@ -143,35 +143,16 @@ namespace WokFlow.Pages.Shared
                 .ToList();
             bool req2Met = quizScores.Count > 0 && quizScores.Average() >= 80;
 
-            // Requirement 3: Active for 30+ days
-            var user = db.Users.Find(CurrentUserId);
-            bool req3Met = user != null && (DateTime.UtcNow - user.JoinedDate).TotalDays >= 30;
-
             litReq1Icon.Text = req1Met ? GetCheckedIcon() : GetUncheckedIcon();
             litReq2Icon.Text = req2Met ? GetCheckedIcon() : GetUncheckedIcon();
-            litReq3Icon.Text = req3Met ? GetCheckedIcon() : GetUncheckedIcon();
 
-            // Check existing upgrade request
-            var request = db.SharerRequests
-                .Where(r => r.UserId == CurrentUserId)
-                .OrderByDescending(r => r.RequestDate)
-                .FirstOrDefault();
-
-            if (request != null)
+            // Lock button if requirements not met, unlock if all met
+            bool allRequirementsMet = req1Met && req2Met;
+            if (!allRequirementsMet)
             {
-                lblUpgradeStatus.Text = "Upgrade request status: " + request.Status;
-                lblUpgradeStatus.CssClass = request.Status == "Accepted"
-                    ? "block mt-4 text-sm text-green-600 font-bold"
-                    : request.Status == "Rejected"
-                        ? "block mt-4 text-sm text-red-600 font-bold"
-                        : "block mt-4 text-sm text-orange-600 font-bold";
-
-                if (request.Status == "Pending")
-                {
-                    btnUpgrade.Enabled = false;
-                    btnUpgrade.Text = "Request Pending";
-                    btnUpgrade.CssClass = "px-8 py-3 bg-gray-300 text-gray-500 rounded-full font-bold cursor-default border-0";
-                }
+                btnUpgrade.Enabled = false;
+                btnUpgrade.Text = "Upgrade to Sharer";
+                btnUpgrade.CssClass = "px-8 py-3 bg-gray-300 text-gray-500 rounded-full font-bold cursor-default border-0";
             }
         }
 
@@ -243,19 +224,29 @@ namespace WokFlow.Pages.Shared
         {
             using (var db = new WokFlowContext())
             {
-                var request = new SharerRequest
-                {
-                    UserId = CurrentUserId,
-                    RequestDate = DateTime.UtcNow,
-                    Status = "Pending",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                db.SharerRequests.Add(request);
+                // Verify requirements are still met before upgrading
+                int completedCourses = db.Enrollments
+                    .Count(en => en.UserId == CurrentUserId && en.Status == "Completed");
+                var quizScores = db.QuizResults
+                    .Where(q => q.UserId == CurrentUserId)
+                    .Select(q => q.Score)
+                    .ToList();
+                bool allMet = completedCourses >= 10 && quizScores.Count > 0 && quizScores.Average() >= 80;
+
+                if (!allMet) return;
+
+                // Upgrade role to SHARER
+                var user = db.Users.Find(CurrentUserId);
+                if (user == null) return;
+                user.Role = "SHARER";
+                user.UpdatedAt = DateTime.UtcNow;
                 db.SaveChanges();
             }
 
-            LoadProfile();
+            // Logout and redirect to default page
+            Session.Clear();
+            Session.Abandon();
+            Response.Redirect("~/Default.aspx");
         }
     }
 }

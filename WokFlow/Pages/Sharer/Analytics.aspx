@@ -48,11 +48,14 @@
                     CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none">
                     <asp:ListItem Text="All Cuisine" Value="" />
                 </asp:DropDownList>
-
                 <asp:DropDownList ID="ddlQuizCourse" runat="server" AutoPostBack="true" OnSelectedIndexChanged="btnApplyFilter_Click"
                     CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none">
                 </asp:DropDownList>
-
+                <asp:DropDownList ID="ddlQuizChapter" runat="server" AutoPostBack="true" OnSelectedIndexChanged="btnApplyFilter_Click"
+                    Enabled="false"
+                    CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none disabled:opacity-50 disabled:cursor-not-allowed">
+                    <asp:ListItem Text="All Chapters" Value="" />
+                </asp:DropDownList>
                 <asp:DropDownList ID="ddlQuizStatus" runat="server" AutoPostBack="true" OnSelectedIndexChanged="btnApplyFilter_Click"
                     CssClass="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 cursor-pointer appearance-none">
                     <asp:ListItem Text="All Status" Value="" />

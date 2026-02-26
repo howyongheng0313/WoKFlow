@@ -53,10 +53,10 @@
                             <div class="w-4 h-4 rounded border border-gray-300 shrink-0"></div>
                             <span class="font-bold text-[#1A1A1A] flex-1 min-w-0 truncate"><%# Eval("Title") %></span>
                             <span class="text-sm text-gray-400 shrink-0 w-28"><%# ((DateTime)Eval("CreatedDate")).ToString("yyyy-MM-dd") %></span>
-                            <span class="text-sm shrink-0 w-20 text-right <%# Eval("Status").ToString() == "Active" ? "text-gray-700" : "text-gray-400" %>">
+                            <span class="text-sm shrink-0 w-20 text-right <%# Eval("Status").ToString() == "Active" ? "text-gray-700" : Eval("Status").ToString() == "Banned" ? "text-red-600 font-bold" : "text-gray-400" %>">
                                 <%# Eval("Status") %>
                             </span>
-                            <div class="relative shrink-0">
+                            <div class="relative shrink-0" style='<%# Eval("Status").ToString() == "Banned" ? "visibility:hidden" : "" %>'>
                                 <button type="button" onclick="toggleMenu(this)"
                                     class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors font-bold text-lg leading-none">&#8942;</button>
                                 <div class="menu-dropdown hidden absolute right-0 top-9 bg-white border border-gray-100 rounded-xl shadow-lg z-10 min-w-[130px] py-1">
@@ -89,10 +89,10 @@
 
                 <asp:Repeater ID="rptEnrolledCourses" runat="server" OnItemCommand="rptEnrolledCourses_ItemCommand">
                     <ItemTemplate>
-                        <div class="flex items-center gap-4 py-5 border-b border-gray-100 hover:bg-[#FFF8F0] transition-colors px-8 cursor-pointer"
-                            onclick="navigateToCourse(event, '<%# Eval("CourseId") %>')">
+                        <div class="flex items-center gap-4 py-5 border-b border-gray-100 <%# Eval("CourseStatus").ToString() == "Banned" ? "bg-red-50/50" : "hover:bg-[#FFF8F0] cursor-pointer" %> transition-colors px-8"
+                            onclick="<%# Eval("CourseStatus").ToString() == "Banned" ? "" : "navigateToCourse(event, '" + Eval("CourseId") + "')" %>">
                             <div class="w-4 h-4 rounded border border-gray-300 shrink-0"></div>
-                            <span class="font-bold text-[#1A1A1A] flex-1 min-w-0 truncate"><%# Eval("CourseTitle") %></span>
+                            <span class="font-bold <%# Eval("CourseStatus").ToString() == "Banned" ? "text-gray-400" : "text-[#1A1A1A]" %> flex-1 min-w-0 truncate"><%# Eval("CourseTitle") %><%# Eval("CourseStatus").ToString() == "Banned" ? " <span class='ml-2 text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full'>Banned</span>" : "" %></span>
                             <span class="text-sm text-gray-400 shrink-0 w-28"><%# ((DateTime)Eval("EnrollmentDate")).ToString("yyyy-MM-dd") %></span>
                             <div class="flex items-center gap-2 w-48 shrink-0 justify-end">
                                 <div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden max-w-[120px]">

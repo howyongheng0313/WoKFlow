@@ -21,98 +21,95 @@
     <section class="py-20 px-6 max-w-5xl mx-auto">
         <div id="scrollStackContainer">
 
+
+
             <!-- Founder 1: How Yong Heng -->
-            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl" style="background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);">
-                <div class="flex flex-col md:flex-row" style="min-height: 420px;">
-                    <div class="flex-1 p-12 flex flex-col justify-center">
+            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl h-[700px]" style="background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="flex-1 p-12 flex flex-col justify-center h-full">
                         <span class="inline-block text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 self-start"
                               style="background: linear-gradient(to right, #FF8C66, #FF6B4A);">Co-Founder</span>
                         <h2 class="text-4xl font-extrabold text-[#1A1A1A] mb-4">How Yong Heng</h2>
                         <p class="text-gray-500 text-base leading-relaxed" style="max-width: 360px;">
-                            Visionary leader and product strategist. Drives the overall direction of WokFlow,
-                            ensuring every learner gets a world-class culinary education experience.
+                            <strong>Creative Director & UI Lead.</strong> A dedicated perfectionist with an 
+                            unwavering obsession for design. He ensures that every pixel at WokFlow is 
+                            not just functional, but a masterpiece of culinary art.
                         </p>
                     </div>
-                    <div class="flex-1 flex items-center justify-center rounded-r-3xl" style="background: #ede8e3; min-height: 300px;">
-                        <div class="flex flex-col items-center gap-3 text-gray-400">
-                            <div class="w-28 h-28 rounded-full flex items-center justify-center" style="background: #d9d0c8;">
-                                <i data-lucide="user" class="w-14 h-14" style="color: #b0a49a;"></i>
-                            </div>
-                            <span class="text-sm font-medium" style="color: #b0a49a;">Photo coming soon</span>
-                        </div>
+                    <div class="flex-1 h-full overflow-hidden">
+                        <img src=<%: ResolveUrl("~/Content/Images/yongheng.jpeg") %> 
+                             alt="How Yong Heng" 
+                             class="w-full h-full object-cover" 
+                             style="object-position: center top;"> 
                     </div>
-                </div>
+                 </div>
             </div>
 
             <!-- Founder 2: Leong Yu Hang -->
-            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);">
-                <div class="flex flex-col md:flex-row" style="min-height: 420px;">
-                    <div class="flex-1 p-12 flex flex-col justify-center">
+            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl h-[700px]" style="background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="flex-1 p-12 flex flex-col justify-center h-full">
                         <span class="inline-block text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 self-start"
                               style="background: linear-gradient(to right, #FF8C66, #FF6B4A);">Co-Founder</span>
                         <h2 class="text-4xl font-extrabold text-[#1A1A1A] mb-4">Leong Yu Hang</h2>
                         <p class="text-gray-500 text-base leading-relaxed" style="max-width: 360px;">
-                            Technical architect and full-stack engineer. Builds the backbone of WokFlow's
-                            learning platform, from database design to seamless user experiences.
+                            <strong>Architecture Director.</strong> The "big brother" and steady heart of the team. 
+                            He balances complex system design with a grounding presence, ensuring 
+                            technical stability and team morale never waver.
                         </p>
                     </div>
-                    <div class="flex-1 flex items-center justify-center rounded-r-3xl" style="background: #c8e6c9; min-height: 300px;">
-                        <div class="flex flex-col items-center gap-3 text-gray-400">
-                            <div class="w-28 h-28 rounded-full flex items-center justify-center" style="background: #a5d6a7;">
-                                <i data-lucide="user" class="w-14 h-14" style="color: #81c784;"></i>
-                            </div>
-                            <span class="text-sm font-medium" style="color: #81c784;">Photo coming soon</span>
-                        </div>
+                    <div class="flex-1 h-full overflow-hidden">
+                        <img src=<%: ResolveUrl("~/Content/Images/yuhang.jpeg") %> 
+                             alt="Leong Yu Hang" 
+                             class="w-full h-full object-cover" 
+                             style="object-position: center top;"> 
                     </div>
-                </div>
+                 </div>
             </div>
 
             <!-- Founder 3: Randy Chee Yee Kae -->
-            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
-                <div class="flex flex-col md:flex-row" style="min-height: 420px;">
-                    <div class="flex-1 p-12 flex flex-col justify-center">
+            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl h-[700px]" style="background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="flex-1 p-12 flex flex-col justify-center h-full">
                         <span class="inline-block text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 self-start"
                               style="background: linear-gradient(to right, #FF8C66, #FF6B4A);">Co-Founder</span>
                         <h2 class="text-4xl font-extrabold text-[#1A1A1A] mb-4">Randy Chee Yee Kae</h2>
                         <p class="text-gray-500 text-base leading-relaxed" style="max-width: 360px;">
-                            Community builder and content strategist. Works tirelessly to grow our network
-                            of learners and sharers, fostering a vibrant knowledge-sharing ecosystem.
+                            <strong>Database Director.</strong> Known for his unflappable composure and 
+                            keen eye for elegance. He crafts resilient data structures with a calm logic, 
+                            always finding the beauty in organized complexity.
                         </p>
                     </div>
-                    <div class="flex-1 flex items-center justify-center rounded-r-3xl" style="background: #d1c4e9; min-height: 300px;">
-                        <div class="flex flex-col items-center gap-3 text-gray-400">
-                            <div class="w-28 h-28 rounded-full flex items-center justify-center" style="background: #b39ddb;">
-                                <i data-lucide="user" class="w-14 h-14" style="color: #9575cd;"></i>
-                            </div>
-                            <span class="text-sm font-medium" style="color: #9575cd;">Photo coming soon</span>
-                        </div>
+                    <div class="flex-1 h-full overflow-hidden">
+                        <img src=<%: ResolveUrl("~/Content/Images/randy.jpeg") %> 
+                             alt="Randy Chee" 
+                             class="w-full h-full object-cover" 
+                             style="object-position: center top;"> 
                     </div>
-                </div>
+                 </div>
             </div>
 
             <!-- Founder 4: Kuek Zheng Yu -->
-            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl" style="background: linear-gradient(135deg, #fff8f0 0%, #fef3e2 100%);">
-                <div class="flex flex-col md:flex-row" style="min-height: 420px;">
-                    <div class="flex-1 p-12 flex flex-col justify-center">
+            <div class="scroll-stack-card rounded-3xl overflow-hidden mb-10 shadow-xl h-[700px]" style="background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="flex-1 p-12 flex flex-col justify-center h-full">
                         <span class="inline-block text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 self-start"
                               style="background: linear-gradient(to right, #FF8C66, #FF6B4A);">Co-Founder</span>
                         <h2 class="text-4xl font-extrabold text-[#1A1A1A] mb-4">Kuek Zheng Yu</h2>
                         <p class="text-gray-500 text-base leading-relaxed" style="max-width: 360px;">
-                            Design lead and UX innovator. Crafts the visual identity and intuitive interactions
-                            that make WokFlow a delightful platform for culinary enthusiasts worldwide.
+                            <strong>Backend Director.</strong> A quiet strategist with a razor-sharp mind. 
+                            He translates vision into high-performance code, letting his rigorous logic 
+                            and flawless execution speak louder than words.
                         </p>
                     </div>
-                    <div class="flex-1 flex items-center justify-center rounded-r-3xl" style="background: #ffe0b2; min-height: 300px;">
-                        <div class="flex flex-col items-center gap-3 text-gray-400">
-                            <div class="w-28 h-28 rounded-full flex items-center justify-center" style="background: #ffcc80;">
-                                <i data-lucide="user" class="w-14 h-14" style="color: #ffa726;"></i>
-                            </div>
-                            <span class="text-sm font-medium" style="color: #ffa726;">Photo coming soon</span>
-                        </div>
+                    <div class="flex-1 h-full overflow-hidden">
+                        <img src=<%: ResolveUrl("~/Content/Images/zhengyu.png") %> 
+                             alt="Kuek Zhneg Yu" 
+                             class="w-full h-full object-cover" 
+                             style="object-position: center top;"> 
                     </div>
-                </div>
+                 </div>
             </div>
-
         </div>
     </section>
 

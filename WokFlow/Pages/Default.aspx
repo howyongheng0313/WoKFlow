@@ -11,18 +11,20 @@
                 <div class="relative z-10 w-full max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center lg:items-center gap-12 lg:gap-16">
                     <!-- Left Column: Text Content -->
                     <div class="flex-1 text-center lg:text-left">
+                        <!-- Title -->
                         <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#1A1A1A] mb-6 leading-tight" id="heroHeading">
                             Find Your<br /><span class="text-[#FF8C66]">Culinary Flow</span>
                         </h1>
 
+                        <!-- Subtitle -->
                         <p class="text-lg md:text-xl text-gray-500 mb-10 max-w-xl mx-auto lg:mx-0" id="heroSubtext">
                             Master world-class recipes through interactive tutorials, expert quizzes, and step-by-step guidance.
                         </p>
-
-                        <!-- CTA Button -->
+                        
+                        <!-- Start Cooking Button -->
                         <div id="heroCta">
                             <a href="<%: ResolveUrl("~/Pages/Auth/Login.aspx") %>"
-                               class="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white px-10 py-4 rounded-full text-lg font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all transform hover:-translate-y-1 no-underline">
+                                class="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white px-10 py-4 rounded-full text-lg font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all transform hover:-translate-y-1 no-underline">
                                 <i data-lucide="chef-hat" class="w-5 h-5"></i>
                                 Start Cooking
                             </a>
@@ -40,7 +42,7 @@
 
                             <!-- Front Image Square (fades in with blur) -->
                             <div id="heroImageSquare"
-                                 class="absolute top-6 left-6 md:top-8 md:left-8 w-[calc(100%-24px)] h-[calc(100%-24px)] md:w-[calc(100%-32px)] md:h-[calc(100%-32px)] rounded-2xl overflow-hidden shadow-2xl opacity-0 will-change-transform">
+                                class="absolute top-6 left-6 md:top-8 md:left-8 w-[calc(100%-24px)] h-[calc(100%-24px)] md:w-[calc(100%-32px)] md:h-[calc(100%-32px)] rounded-2xl overflow-hidden shadow-2xl opacity-0 will-change-transform">
                                 <img src="<%: ResolveUrl("~/Content/Images/landing-page.png") %>"
                                      alt="Wok cooking"
                                      class="w-full h-full object-cover" />

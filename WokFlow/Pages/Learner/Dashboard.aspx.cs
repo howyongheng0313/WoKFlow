@@ -124,6 +124,19 @@ namespace WokFlow.Pages.Learner
             return ids != null && ids.Contains(courseId);
         }
 
+        protected string GetCardClass(int courseId)
+        {
+            return IsEnrolled(courseId)
+                ? "glass-panel rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                : "glass-panel rounded-2xl overflow-hidden hover:shadow-lg transition-all";
+        }
+
+        protected string GetCardHref(int courseId)
+        {
+            if (!IsEnrolled(courseId)) return "";
+            return ResolveUrl("~/Pages/Shared/CourseDetail.aspx?id=" + courseId);
+        }
+
         protected void rptCourses_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName == "Join")
@@ -175,7 +188,7 @@ namespace WokFlow.Pages.Learner
                     }
 
                     // Redirect to course detail
-                    Response.Redirect("../Pages/Shared/CourseDetail.aspx?id=" + courseId);
+                    Response.Redirect("~/Pages/Shared/CourseDetail.aspx?id=" + courseId);
                 }
             }
         }

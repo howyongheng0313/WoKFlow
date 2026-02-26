@@ -15,13 +15,13 @@ namespace WokFlow.Controls
         {
             get
             {
-                return (CurrentPage == "UserManagement" || CurrentPage == "SharerRequests" || CurrentPage == "SharerRegistration" );
+                return CurrentPage == "UserManagement" ||
+                       CurrentPage == "SharerRegistration";
             }
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
         }
     }
 }

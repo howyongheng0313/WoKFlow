@@ -222,15 +222,6 @@ namespace WokFlow.Pages.Shared
         protected global::System.Web.UI.WebControls.Literal litReq2Icon;
 
         /// <summary>
-        /// litReq3Icon control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litReq3Icon;
-
-        /// <summary>
         /// btnUpgrade control.
         /// </summary>
         /// <remarks>
@@ -238,14 +229,5 @@ namespace WokFlow.Pages.Shared
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnUpgrade;
-
-        /// <summary>
-        /// lblUpgradeStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUpgradeStatus;
     }
 }

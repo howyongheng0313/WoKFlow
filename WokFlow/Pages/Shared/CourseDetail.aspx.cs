@@ -306,9 +306,42 @@ namespace WokFlow.Pages.Shared
             return stars;
         }
 
-        protected void btnReport_Click(object sender, EventArgs e)
+        protected void btnSubmitReport_Click(object sender, EventArgs e)
         {
+            string reason = hdnReportReason.Value?.Trim();
+            if (string.IsNullOrEmpty(reason))
+            {
+                LoadCourse();
+                return;
+            }
+
+            using (var db = new WokFlowContext())
+            {
+                var report = new ReportedContent
+                {
+                    CourseId = CourseId,
+                    ReporterId = CurrentUserId,
+                    Reason = reason,
+                    ReportDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                db.ReportedContents.Add(report);
+                db.SaveChanges();
+            }
+
+            hdnReportReason.Value = "";
             LoadCourse();
+
+            // Show success feedback in the modal
+            lblReportMsg.Text = "Your report has been submitted. Thank you.";
+            lblReportMsg.CssClass = "block text-sm mt-3 font-medium text-green-600";
+            lblReportMsg.Visible = true;
+
+            // Re-open the modal so the user sees the confirmation
+            ScriptManager.RegisterStartupScript(this, GetType(), "showReportSuccess",
+                "document.getElementById('reportModal').style.display='';if(typeof lucide!=='undefined')lucide.createIcons();", true);
         }
 
         protected void btnAddComment_Click(object sender, EventArgs e)

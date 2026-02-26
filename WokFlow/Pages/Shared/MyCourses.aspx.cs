@@ -58,6 +58,7 @@ namespace WokFlow.Pages.Shared
                 ddlStatus.Items.Add(new ListItem("All Status", ""));
                 ddlStatus.Items.Add(new ListItem("Active", "Active"));
                 ddlStatus.Items.Add(new ListItem("Deleted", "Deleted"));
+                ddlStatus.Items.Add(new ListItem("Banned", "Banned"));
             }
             else
             {
@@ -143,6 +144,7 @@ namespace WokFlow.Pages.Shared
                             en.EnrollmentId,
                             en.CourseId,
                             CourseTitle = en.Course.Title,
+                            CourseStatus = en.Course.Status,
                             en.Progress,
                             en.Status,
                             en.EnrollmentDate
@@ -229,9 +231,12 @@ namespace WokFlow.Pages.Shared
                         db.SaveChanges();
                         break;
                     case "Recover":
-                        course.Status = "Active";
-                        course.UpdatedAt = DateTime.UtcNow;
-                        db.SaveChanges();
+                        if (course.Status == "Deleted")
+                        {
+                            course.Status = "Active";
+                            course.UpdatedAt = DateTime.UtcNow;
+                            db.SaveChanges();
+                        }
                         break;
                 }
             }

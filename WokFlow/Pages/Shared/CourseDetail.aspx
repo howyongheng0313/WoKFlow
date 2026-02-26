@@ -52,8 +52,10 @@
                 <div class="glass-panel rounded-2xl p-6 mb-8">
                     <div class="flex items-start justify-between mb-2">
                         <h1 class="text-xl font-bold text-[#1A1A1A] flex-1"><asp:Literal ID="litTitle" runat="server" /></h1>
-                        <asp:Button ID="btnReport" runat="server" Text="Report &#9651;" OnClick="btnReport_Click"
-                            CssClass="text-sm text-gray-400 bg-transparent border-0 cursor-pointer hover:text-red-400 transition-colors shrink-0 ml-4" />
+                        <button type="button" onclick="openReportModal()"
+                            class="text-sm text-gray-400 bg-transparent border-0 cursor-pointer hover:text-red-400 transition-colors shrink-0 ml-4 flex items-center gap-1">
+                            Report <span style="font-size:10px;">&#9651;</span>
+                        </button>
                     </div>
                     <div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
                         <span class="flex items-center gap-1.5">
@@ -205,6 +207,67 @@
             </div>
         </div>
         <uc:ScoreModal ID="scoreModal" runat="server" />
+
+        <!-- Report Modal -->
+        <div id="reportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm p-4" style="display:none;">
+            <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden border border-white/60">
+                <!-- Header -->
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+                            <i data-lucide="flag" class="w-4.5 h-4.5 text-red-400"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-[#1A1A1A]">Report Course</h2>
+                    </div>
+                    <button type="button" onclick="closeReportModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-[#1A1A1A] hover:bg-gray-100 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6">
+                    <p class="text-sm text-gray-500 mb-4">Please tell us why you are reporting this course. Our team will review your report promptly.</p>
+
+                    <!-- Reason quick-select pills -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button type="button" onclick="selectReportReason(this, 'Inappropriate content')"
+                            class="report-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-500 bg-white hover:border-[#FF8C66] hover:text-[#FF8C66] transition-all cursor-pointer">
+                            Inappropriate content
+                        </button>
+                        <button type="button" onclick="selectReportReason(this, 'Misleading information')"
+                            class="report-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-500 bg-white hover:border-[#FF8C66] hover:text-[#FF8C66] transition-all cursor-pointer">
+                            Misleading information
+                        </button>
+                        <button type="button" onclick="selectReportReason(this, 'Copyright violation')"
+                            class="report-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-500 bg-white hover:border-[#FF8C66] hover:text-[#FF8C66] transition-all cursor-pointer">
+                            Copyright violation
+                        </button>
+                        <button type="button" onclick="selectReportReason(this, 'Spam or scam')"
+                            class="report-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-500 bg-white hover:border-[#FF8C66] hover:text-[#FF8C66] transition-all cursor-pointer">
+                            Spam or scam
+                        </button>
+                    </div>
+
+                    <asp:HiddenField ID="hdnReportReason" runat="server" />
+                    <textarea id="txtReportReason" rows="4"
+                        class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-[#FF8C66] transition-colors"
+                        placeholder="Describe the issue in detail..." oninput="syncReportReason()"></textarea>
+
+                    <asp:Label ID="lblReportMsg" runat="server" CssClass="block text-sm mt-3 font-medium" Visible="false" />
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 pb-6 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeReportModal()"
+                        class="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                        Cancel
+                    </button>
+                    <asp:Button ID="btnSubmitReport" runat="server" Text="Submit Report" OnClick="btnSubmitReport_Click"
+                        OnClientClick="return validateReport();"
+                        CssClass="px-6 py-2.5 rounded-xl text-sm font-bold bg-[#1A1A1A] text-white cursor-pointer border-0 hover:bg-[#333] transition-colors" />
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>lucide.createIcons();</script>
@@ -222,6 +285,45 @@
             var hdn = document.getElementById('<%= hdnSelectedAnswer.ClientID %>');
             if (hdn) hdn.value = answerId;
         }
+
+        // Report modal
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = '';
+            document.getElementById('txtReportReason').value = '';
+            document.getElementById('<%= hdnReportReason.ClientID %>').value = '';
+            document.querySelectorAll('.report-pill').forEach(function (p) {
+                p.classList.remove('border-[#FF8C66]', 'text-[#FF8C66]', 'bg-orange-50');
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+        function selectReportReason(el, reason) {
+            document.querySelectorAll('.report-pill').forEach(function (p) {
+                p.classList.remove('border-[#FF8C66]', 'text-[#FF8C66]', 'bg-orange-50');
+            });
+            el.classList.add('border-[#FF8C66]', 'text-[#FF8C66]', 'bg-orange-50');
+            document.getElementById('txtReportReason').value = reason;
+            syncReportReason();
+        }
+        function syncReportReason() {
+            document.getElementById('<%= hdnReportReason.ClientID %>').value = document.getElementById('txtReportReason').value;
+        }
+        function validateReport() {
+            syncReportReason();
+            var reason = document.getElementById('<%= hdnReportReason.ClientID %>').value.trim();
+            if (!reason) {
+                document.getElementById('txtReportReason').style.borderColor = '#f87171';
+                document.getElementById('txtReportReason').focus();
+                return false;
+            }
+            return true;
+        }
+        // Close report modal on backdrop click
+        document.getElementById('reportModal').addEventListener('click', function (e) {
+            if (e.target === this) closeReportModal();
+        });
 
         // Star rating
         (function () {

@@ -24,15 +24,6 @@ namespace WokFlow.Pages.Shared
         protected global::System.Web.UI.WebControls.Literal litTitle;
 
         /// <summary>
-        /// btnReport control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnReport;
-
-        /// <summary>
         /// litDifficulty control.
         /// </summary>
         /// <remarks>
@@ -247,5 +238,32 @@ namespace WokFlow.Pages.Shared
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::WokFlow.Controls.ScoreModal scoreModal;
+
+        /// <summary>
+        /// hdnReportReason control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnReportReason;
+
+        /// <summary>
+        /// lblReportMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblReportMsg;
+
+        /// <summary>
+        /// btnSubmitReport control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSubmitReport;
     }
 }
