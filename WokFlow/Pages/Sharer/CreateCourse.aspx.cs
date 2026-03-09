@@ -9,18 +9,21 @@ using WokFlow.Models;
 
 namespace WokFlow.Pages.Sharer
 {
+    [Serializable]
     public class AnswerEntry
     {
         public string Text { get; set; } = "";
         public bool IsCorrect { get; set; }
     }
 
+    [Serializable]
     public class QuestionEntry
     {
         public string QuestionText { get; set; } = "";
         public List<AnswerEntry> Answers { get; set; } = new List<AnswerEntry>();
     }
 
+    [Serializable]
     public class ChapterEntry
     {
         public string Title { get; set; } = "Untitled Chapter";
