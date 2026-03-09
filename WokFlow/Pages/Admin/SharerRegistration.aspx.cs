@@ -15,6 +15,7 @@ namespace WokFlow.Pages.Admin
             BindData();
         }
 
+        // Loads the filtered list of sharer registrations into the repeater.
         private void BindData()
         {
             using (var db = new WokFlowContext())
@@ -44,9 +45,10 @@ namespace WokFlow.Pages.Admin
             }
         }
 
+        // Handles Accept, Reject, and Undo commands for a sharer registration.
         protected void rptRegistrations_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            int id = int.Parse(e.CommandArgument.ToString());
+            if (!int.TryParse(e.CommandArgument.ToString(), out int id)) return;
             using (var db = new WokFlowContext())
             {
                 var reg = db.SharerRegistrations.Find(id);
@@ -55,6 +57,7 @@ namespace WokFlow.Pages.Admin
                 switch (e.CommandName)
                 {
                     case "Accept":
+                        // Approve registration and promote user to SHARER
                         reg.Status = "Accepted";
                         reg.ReviewedBy = CurrentUserId;
                         reg.ReviewedDate = DateTime.UtcNow;
@@ -65,12 +68,16 @@ namespace WokFlow.Pages.Admin
                             userToPromote.UpdatedAt = DateTime.UtcNow;
                         }
                         break;
+
                     case "Reject":
+                        // Reject registration (user remains GUEST)
                         reg.Status = "Rejected";
                         reg.ReviewedBy = CurrentUserId;
                         reg.ReviewedDate = DateTime.UtcNow;
                         break;
+
                     case "Undo":
+                        // Revert to Pending; demote user back to GUEST if previously accepted
                         if (reg.Status == "Accepted")
                         {
                             var userToDemote = db.Users.Find(reg.UserId);
@@ -91,16 +98,7 @@ namespace WokFlow.Pages.Admin
             BindData();
         }
 
-        protected string GetStatusCss(string status)
-        {
-            switch (status)
-            {
-                case "Accepted": return "bg-green-100 text-green-700";
-                case "Rejected": return "bg-red-100 text-red-700";
-                default: return "bg-orange-100 text-[#FF8C66]";
-            }
-        }
-
+        // Re-binds data when any filter dropdown or search box changes.
         protected void Filter_Changed(object sender, EventArgs e) => BindData();
     }
 }
