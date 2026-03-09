@@ -168,11 +168,13 @@ namespace WokFlow.Pages.Shared
             }
         }
 
+        // Load quiz scores 
         private void LoadScores(WokFlowContext db, List<Chapter> chapters)
         {
             var chapterMap = chapters.ToDictionary(ch => ch.ChapterId, ch => ch.Title);
             var chapterIds = chapterMap.Keys.ToList();
 
+            // Get all quiz results for this user and course chapters
             var scores = db.QuizResults
                 .Where(q => q.UserId == CurrentUserId && chapterIds.Contains(q.ChapterId))
                 .OrderBy(q => q.ChapterId)
@@ -190,8 +192,10 @@ namespace WokFlow.Pages.Shared
             scoreModal.Scores = scores;
         }
 
+        // Load Comments
         private void LoadComments(WokFlowContext db)
         {
+            // Get all comments for this course with user info
             var comments = db.Comments
                 .Where(c => c.CourseId == CourseId)
                 .Include("User")
@@ -210,8 +214,10 @@ namespace WokFlow.Pages.Shared
             rptComments.DataBind();
         }
 
+        // Load Quiz
         private void LoadQuiz(int chapterId)
         {
+            // Get all questions for the chapter with answers
             using (var db = new WokFlowContext())
             {
                 var questions = db.Questions
@@ -222,6 +228,7 @@ namespace WokFlow.Pages.Shared
 
                 TotalQuestions = questions.Count;
 
+                // If no questions, show no quiz message
                 if (TotalQuestions == 0)
                 {
                     pnlNoQuiz.Visible = true;
@@ -247,6 +254,7 @@ namespace WokFlow.Pages.Shared
             }
         }
 
+        // Check if chapter is unlocked
         protected bool IsChapterUnlocked(int chapterId)
         {
             var map = ViewState["ChapterUnlocked"] as Dictionary<int, bool>;
@@ -254,6 +262,7 @@ namespace WokFlow.Pages.Shared
             return map.ContainsKey(chapterId) && map[chapterId];
         }
 
+        // Get CSS class for chapter item based on its state
         protected string GetChapterCss(int chapterId, bool isCompleted)
         {
             if (chapterId == ActiveChapterId && IsChapterUnlocked(chapterId))
@@ -263,6 +272,7 @@ namespace WokFlow.Pages.Shared
             return "bg-gray-50 opacity-60 cursor-not-allowed";
         }
 
+        // Render star rating as HTML
         protected string RenderStars(int rating)
         {
             string stars = "";
@@ -275,8 +285,10 @@ namespace WokFlow.Pages.Shared
             return stars;
         }
 
+        // Handle report submission
         protected void btnSubmitReport_Click(object sender, EventArgs e)
         {
+            // Validate reason
             string reason = hdnReportReason.Value?.Trim();
             if (string.IsNullOrEmpty(reason))
             {
@@ -284,6 +296,7 @@ namespace WokFlow.Pages.Shared
                 return;
             }
 
+            // Save report to database
             using (var db = new WokFlowContext())
             {
                 var report = new ReportedContent
@@ -313,15 +326,19 @@ namespace WokFlow.Pages.Shared
                 "document.getElementById('reportModal').style.display='';if(typeof lucide!=='undefined')lucide.createIcons();", true);
         }
 
+        // Handle adding a new comment
         protected void btnAddComment_Click(object sender, EventArgs e)
         {
+            // Validate comment text
             string text = txtComment.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
+            // Validate rating
             int rating = 5;
             int.TryParse(hdnRating.Value, out rating);
             if (rating < 1 || rating > 5) rating = 5;
 
+            // Save comment to database
             using (var db = new WokFlowContext())
             {
                 var comment = new Comment
@@ -342,6 +359,7 @@ namespace WokFlow.Pages.Shared
             LoadCourse();
         }
 
+        // Handle previous question navigation
         protected void btnPrevQuestion_Click(object sender, EventArgs e)
         {
             if (CurrentQuestionIndex > 0) CurrentQuestionIndex--;
@@ -349,15 +367,18 @@ namespace WokFlow.Pages.Shared
             LoadCourse();
         }
 
+        // Handle next question navigation and quiz submission
         protected void btnNextQuestion_Click(object sender, EventArgs e)
         {
             int chapterId = SelectedChapterId;
 
+            // Get selected answer for current question
             int selectedAnswerId;
             int.TryParse(hdnSelectedAnswer.Value, out selectedAnswerId);
 
             using (var db = new WokFlowContext())
             {
+                // If chapterId is not in query, default to first chapter of the course
                 if (chapterId == 0)
                     chapterId = db.Chapters
                         .Where(ch => ch.CourseId == CourseId)
@@ -365,15 +386,17 @@ namespace WokFlow.Pages.Shared
                         .Select(ch => ch.ChapterId)
                         .FirstOrDefault();
 
+                // If still no chapter found, return
                 if (chapterId == 0) return;
 
+                // Get all questions for the chapter with answers
                 var questions = db.Questions
                     .Where(q => q.ChapterId == chapterId)
                     .Include("Answers")
                     .OrderBy(q => q.QuestionOrder)
                     .ToList();
 
-                // Store answer for current question
+                // Store selected answer for current question
                 if (selectedAnswerId > 0 && CurrentQuestionIndex < questions.Count)
                 {
                     var answers = StoredAnswers;
@@ -425,8 +448,10 @@ namespace WokFlow.Pages.Shared
             }
         }
 
+        // Save quiz result and update chapter/course progress
         private void SaveQuizResult(WokFlowContext db, int chapterId, int score, bool passed)
         {
+            // Save quiz result
             var result = new QuizResult
             {
                 UserId = CurrentUserId,
@@ -438,12 +463,14 @@ namespace WokFlow.Pages.Shared
             };
             db.QuizResults.Add(result);
 
+            // Marked chapeter as completed if passed
             if (passed)
                 CompleteChapter(db, chapterId);
 
             db.SaveChanges();
         }
 
+        // Mark chapter as completed and unlock next chapter if exists
         private void CompleteChapter(WokFlowContext db, int chapterId)
         {
             var progress = db.UserChapterProgress
@@ -492,24 +519,30 @@ namespace WokFlow.Pages.Shared
             }
         }
 
+        // Recalculate and update course progress percentage and status
         private void UpdateCourseProgress(WokFlowContext db, int courseId)
         {
+            // Get enrollment record for the course
             var enroll = db.Enrollments
                 .FirstOrDefault(en => en.UserId == CurrentUserId && en.CourseId == courseId);
             if (enroll == null) return;
 
+            // Get total chapters for the course
             int totalChapters = db.Chapters.Count(ch => ch.CourseId == courseId);
             if (totalChapters == 0) return;
 
+            // Get completed chapters count for the user
             var chapterIds = db.Chapters.Where(ch => ch.CourseId == courseId).Select(ch => ch.ChapterId).ToList();
             int completed = db.UserChapterProgress
                 .Count(p => p.UserId == CurrentUserId && chapterIds.Contains(p.ChapterId) && p.IsCompleted);
 
+            // Update progress percentage and status
             enroll.Progress = (int)Math.Round((double)completed / totalChapters * 100);
             enroll.Status = enroll.Progress == 100 ? "Completed" : "In Progress";
             enroll.UpdatedAt = DateTime.UtcNow;
         }
 
+        // Get chapter link href based on unlock status
         protected string GetChapterHref(object dataItem)
         {
             int chapterId = (int)DataBinder.Eval(dataItem, "ChapterId");
@@ -518,6 +551,7 @@ namespace WokFlow.Pages.Shared
                 : "#";
         }
 
+        // Get CSS class for chapter item based on its state
         protected string GetChapterCss(object dataItem)
         {
             return GetChapterCss(
@@ -525,6 +559,7 @@ namespace WokFlow.Pages.Shared
                 (bool)DataBinder.Eval(dataItem, "IsCompleted"));
         }
 
+        // Get CSS class for chapter badge based on its state
         protected string GetChapterBadgeCss(object dataItem)
         {
             int chapterId = (int)DataBinder.Eval(dataItem, "ChapterId");
@@ -534,6 +569,7 @@ namespace WokFlow.Pages.Shared
             return "bg-gray-100 text-gray-400";
         }
 
+        // Get content for chapter badge
         protected string GetChapterBadgeContent(object dataItem)
         {
             int chapterId = (int)DataBinder.Eval(dataItem, "ChapterId");
@@ -544,6 +580,7 @@ namespace WokFlow.Pages.Shared
             return "&#128274;";
         }
 
+        // Get CSS class for chapter title based on its state
         protected string GetChapterTitleCss(object dataItem)
         {
             int chapterId = (int)DataBinder.Eval(dataItem, "ChapterId");

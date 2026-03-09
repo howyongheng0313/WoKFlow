@@ -97,7 +97,7 @@
                 <p class="text-gray-500 text-sm mb-6">Requirements to become a Professional Sharer:</p>
 
                 <div class="space-y-4 mb-8">
-                    <!-- Requirement 1: Complete 10 courses -->
+                    <!-- Requirement 1: Complete 3 courses -->
                     <div class="flex items-center gap-3">
                         <asp:Literal ID="litReq1Icon" runat="server" />
                         <span class="text-gray-700 text-sm">Complete at least 3 courses</span>
