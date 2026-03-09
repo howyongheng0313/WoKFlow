@@ -12,22 +12,23 @@ namespace WokFlow.Pages.Learner
 {
     public partial class Dashboard : LearnerPage
     {
-        private List<int> _enrolledCourseIds;
-
         private const int PageSize = 6;
 
+        // Store current page and total pages in ViewState for pagination
         protected int CurrentPage
         {
             get { return ViewState["CurrentPage"] != null ? (int)ViewState["CurrentPage"] : 1; }
             set { ViewState["CurrentPage"] = value; }
         }
 
+        // Calculate total pages based on total course count and page size
         private int TotalPages
         {
             get { return ViewState["TotalPages"] != null ? (int)ViewState["TotalPages"] : 1; }
             set { ViewState["TotalPages"] = value; }
         }
 
+        // Page Load
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -36,10 +37,12 @@ namespace WokFlow.Pages.Learner
             }
         }
 
+        // Main method to bind courses based on filters, sorting, and pagination
         private void BindCourses()
         {
             using (var db = new WokFlowContext())
             {
+                // Base query for active courses with cuisine data
                 var query = db.Courses
                     .Where(c => c.Status == "Active")
                     .Include("Cuisine")
@@ -57,9 +60,9 @@ namespace WokFlow.Pages.Learner
 
                 // Difficulty filter
                 string diff = ddlDifficulty.SelectedValue;
-                if (!string.IsNullOrEmpty(diff))
+                int difficulty;
+                if (!string.IsNullOrEmpty(diff) && int.TryParse(diff, out difficulty))
                 {
-                    int difficulty = int.Parse(diff);
                     query = query.Where(c => c.Difficulty == difficulty);
                 }
 
@@ -75,13 +78,14 @@ namespace WokFlow.Pages.Learner
                 if (CurrentPage > TotalPages) CurrentPage = TotalPages;
                 if (CurrentPage < 1) CurrentPage = 1;
 
+                // Select only necessary fields for display
                 var courses = sortedQuery
                     .Select(c => new
                     {
                         c.CourseId,
                         c.Title,
                         c.Description,
-                        CuisineName = c.Cuisine.CuisineName,
+                        CuisineName = c.Cuisine != null ? c.Cuisine.CuisineName : "Unknown",
                         c.Duration,
                         c.Difficulty,
                         c.ImageUrl
@@ -90,13 +94,11 @@ namespace WokFlow.Pages.Learner
                     .Take(PageSize)
                     .ToList();
 
-                // Cache enrolled course IDs
-                _enrolledCourseIds = db.Enrollments
+                // Get enrolled course IDs for current user
+                ViewState["EnrolledIds"] = db.Enrollments
                     .Where(en => en.UserId == CurrentUserId)
                     .Select(en => en.CourseId)
                     .ToList();
-
-                ViewState["EnrolledIds"] = _enrolledCourseIds;
 
                 rptCourses.DataSource = courses;
                 rptCourses.DataBind();
@@ -105,8 +107,10 @@ namespace WokFlow.Pages.Learner
             }
         }
 
+        // Bind pagination controls based on total pages and current page
         private void BindPagination()
         {
+            // Generate page numbers for pagination
             var pages = Enumerable.Range(1, TotalPages)
                 .Select(i => new { PageNumber = i })
                 .ToList();
@@ -118,34 +122,42 @@ namespace WokFlow.Pages.Learner
             btnNext.Enabled = CurrentPage < TotalPages;
         }
 
+        // Check user enrollment status
         protected bool IsEnrolled(int courseId)
         {
             var ids = ViewState["EnrolledIds"] as List<int>;
             return ids != null && ids.Contains(courseId);
         }
 
+        // Get CSS class for course card based on enrollment status
         protected string GetCardClass(int courseId)
         {
-            return IsEnrolled(courseId)
-                ? "glass-panel rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                : "glass-panel rounded-2xl overflow-hidden hover:shadow-lg transition-all";
+            string baseClass = "glass-panel rounded-2xl overflow-hidden hover:shadow-lg transition-all";
+            return IsEnrolled(courseId) ? baseClass + " cursor-pointer" : baseClass;
         }
 
+        // Get hyperlink for course card based on enrollment status
         protected string GetCardHref(int courseId)
         {
             if (!IsEnrolled(courseId)) return "";
             return ResolveUrl("~/Pages/Shared/CourseDetail.aspx?id=" + courseId);
         }
 
+        // Handle Join button click to enroll user in course
         protected void rptCourses_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
+            // Only handle Join command
             if (e.CommandName == "Join")
             {
-                int courseId = int.Parse(e.CommandArgument.ToString());
+                int courseId;
+
+                // Validate course ID from command argument
+                if (!int.TryParse(e.CommandArgument.ToString(), out courseId))
+                    return;
 
                 using (var db = new WokFlowContext())
                 {
-                    // Check if already enrolled
+                    // Check if user is already enrolled in the course
                     bool alreadyEnrolled = db.Enrollments.Any(en =>
                         en.UserId == CurrentUserId && en.CourseId == courseId);
 
@@ -173,6 +185,7 @@ namespace WokFlow.Pages.Learner
 
                         if (firstChapter != null)
                         {
+                            // Create progress record for the first chapter
                             var progress = new UserChapterProgress
                             {
                                 UserId = CurrentUserId,
@@ -193,12 +206,14 @@ namespace WokFlow.Pages.Learner
             }
         }
 
+        // Handle filter changes to reset to first page and rebind courses
         protected void Filter_Changed(object sender, EventArgs e)
         {
             CurrentPage = 1;
             BindCourses();
         }
 
+        // Handle pagination button clicks to navigate between pages
         protected void btnPrev_Click(object sender, EventArgs e)
         {
             if (CurrentPage > 1)
@@ -208,6 +223,7 @@ namespace WokFlow.Pages.Learner
             }
         }
 
+        // Handle pagination button clicks to navigate between pages
         protected void btnNext_Click(object sender, EventArgs e)
         {
             if (CurrentPage < TotalPages)
@@ -217,11 +233,19 @@ namespace WokFlow.Pages.Learner
             }
         }
 
+        // Handle page number clicks in pagination to navigate to specific page
         protected void rptPages_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
+            // Only handle Page command
             if (e.CommandName == "Page")
             {
-                int page = int.Parse(e.CommandArgument.ToString());
+                int page;
+
+                // Validate page number from command argument
+                if (!int.TryParse(e.CommandArgument.ToString(), out page))
+                    return;
+
+                // Ensure page number is within valid range before navigating
                 if (page >= 1 && page <= TotalPages)
                 {
                     CurrentPage = page;
