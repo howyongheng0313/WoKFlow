@@ -14,7 +14,7 @@ namespace WokFlow.Pages.Shared
     {
         private const int PageSize = 8;
 
-        // Store current page and total pages in ViewState for pagination
+        // Store current page in ViewState for pagination
         protected int CurrentPage
         {
             get { return ViewState["CurrentPage"] != null ? (int)ViewState["CurrentPage"] : 1; }
@@ -28,13 +28,13 @@ namespace WokFlow.Pages.Shared
             set { ViewState["TotalPages"] = value; }
         }
 
-        // Determine active tab based on query string or default based on role
+        // Determine active tab
         protected string ActiveTab
         {
             get { return Request.QueryString["tab"] ?? (IsSharer ? "created" : "joined"); }
         }
 
-        // Check if current user is a sharer based on role
+        // Check if current user is a sharer
         protected bool IsSharer
         {
             get { return CurrentUserRole == "SHARER"; }
@@ -50,7 +50,7 @@ namespace WokFlow.Pages.Shared
             }
         }
 
-        // Setup page elements based on active tab and user role
+        // Setup page elements
         private void SetupPage()
         {
             // Dynamic page title
@@ -218,7 +218,7 @@ namespace WokFlow.Pages.Shared
             }
         }
 
-        // Event handlers for search, pagination, and item commands
+        // Search button click
         protected void btnSearch_Click(object sender, EventArgs e)
         {
             CurrentPage = 1;
@@ -241,8 +241,6 @@ namespace WokFlow.Pages.Shared
         protected void rptCreatedCourses_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             int courseId;
-
-            // Ensure the command argument is a valid integer course ID
             if (!int.TryParse(e.CommandArgument.ToString(), out courseId))
                 return;
 
@@ -251,25 +249,25 @@ namespace WokFlow.Pages.Shared
             {
                 var course = db.Courses.Find(courseId);
 
-                // If course doesn't exist or doesn't belong to the current user, do nothing
+                // If course doesn't exist, do nothing
                 if (course == null || course.CreatorId != CurrentUserId) return;
 
                 switch (e.CommandName)
                 {
                     case "Edit":
-                        // Redirect to edit page with course ID as query parameter
+                        // Redirect to edit page
                         Response.Redirect("~/Pages/Sharer/CreateCourse.aspx?editId=" + courseId);
                         break;
 
                     case "Delete":
-                        // Soft delete by updating status to "Deleted" and setting UpdatedAt timestamp
+                        // Soft delete by updating status to "Deleted"
                         course.Status = "Deleted";
                         course.UpdatedAt = DateTime.UtcNow;
                         db.SaveChanges();
                         break;
 
                     case "Recover":
-                        // Recover by updating status back to "Active" and setting UpdatedAt timestamp
+                        // Recover by updating status back to "Active" 
                         if (course.Status == "Deleted")
                         {
                             course.Status = "Active";

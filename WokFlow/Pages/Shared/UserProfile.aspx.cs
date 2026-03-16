@@ -220,7 +220,7 @@ namespace WokFlow.Pages.Shared
                     .Where(q => q.UserId == CurrentUserId)
                     .Select(q => q.Score)
                     .ToList();
-                bool allMet = completedCourses >= 10 && quizScores.Count > 0 && quizScores.Average() >= 80;
+                bool allMet = completedCourses >= 3 && quizScores.Count > 0 && quizScores.Average() >= 80;
 
                 if (!allMet) return;
 
