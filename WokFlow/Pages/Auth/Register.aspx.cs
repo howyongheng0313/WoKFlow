@@ -125,16 +125,18 @@ namespace WokFlow.Pages.Auth
                     db.SaveChanges();
                 }
 
-                // Auto-login
+                // GUEST users (pending sharer approval) are not logged in
+                if (user.Role == "GUEST")
+                {
+                    Response.Redirect("~/Pages/Auth/Login.aspx?pending=1");
+                    return;
+                }
+
+                // Auto-login for non-GUEST users
                 Session["UserId"] = user.UserId;
                 Session["UserName"] = user.Username;
                 Session["UserRole"] = user.Role;
-
-                // GUEST users (pending sharer approval) go to landing page
-                if (user.Role == "GUEST")
-                    Response.Redirect("~/Default.aspx");
-                else
-                    Response.Redirect("~/Pages/Learner/Dashboard.aspx");
+                Response.Redirect("~/Pages/Learner/Dashboard.aspx");
             }
         }
 

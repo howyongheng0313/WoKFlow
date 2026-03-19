@@ -100,29 +100,15 @@ namespace WokFlow.Pages.Shared
             pnlSaveBtn.Visible = editing;
 
             // Edit button styling
-            if (CurrentUserRole == "LEARNER")
-            {
-                btnEdit.Text = editing ? "Cancel" : "Edit";
-                btnEdit.CssClass = editing
-                    ? "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-200 text-gray-600 text-sm transition-all hover:bg-gray-50 bg-white"
-                    : "px-6 py-2 rounded-full font-bold cursor-pointer border-0 text-sm transition-all bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white shadow-lg shadow-orange-500/20";
-            }
+            string cancelCss = "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-200 text-gray-600 text-sm transition-all hover:bg-gray-50 bg-white";
+            string primaryCss = "px-6 py-2 rounded-full font-bold cursor-pointer border-0 text-sm transition-all bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white shadow-lg shadow-orange-500/20";
+            string subtleCss = "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-300 text-gray-700 text-sm transition-all hover:bg-gray-50 bg-white";
+
+            btnEdit.Text = editing ? "Cancel" : (CurrentUserRole == "LEARNER" ? "Edit" : "Edit Profile");
+            if (editing)
+                btnEdit.CssClass = cancelCss;
             else
-            {
-                btnEdit.Text = editing ? "Cancel" : "Edit Profile";
-                if (CurrentUserRole == "ADMIN")
-                {
-                    btnEdit.CssClass = editing
-                        ? "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-200 text-gray-600 text-sm transition-all hover:bg-gray-50 bg-white"
-                        : "px-6 py-2 rounded-full font-bold cursor-pointer border-0 text-sm transition-all bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white shadow-lg shadow-orange-500/20";
-                }
-                else
-                {
-                    btnEdit.CssClass = editing
-                        ? "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-200 text-gray-600 text-sm transition-all hover:bg-gray-50 bg-white"
-                        : "px-6 py-2 rounded-full font-bold cursor-pointer border border-gray-300 text-gray-700 text-sm transition-all hover:bg-gray-50 bg-white";
-                }
-            }
+                btnEdit.CssClass = CurrentUserRole == "SHARER" ? subtleCss : primaryCss;
 
             // Hide edit button when in edit mode, show save button instead
             btnEdit.Visible = !editing;
@@ -197,12 +183,15 @@ namespace WokFlow.Pages.Shared
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            string newName = txtName.Text.Trim();
+            if (string.IsNullOrWhiteSpace(newName)) return;
+
             using (var db = new WokFlowContext())
             {
                 var user = db.Users.Find(CurrentUserId);
                 if (user == null) return;
 
-                user.Username = txtName.Text.Trim();
+                user.Username = newName;
                 user.Country = countrySelector.SelectedCountry;
                 DateTime parsedBirthDate;
                 if (DateTime.TryParse(calBirthDate.SelectedDate, out parsedBirthDate))
@@ -231,7 +220,7 @@ namespace WokFlow.Pages.Shared
                     .Where(q => q.UserId == CurrentUserId)
                     .Select(q => q.Score)
                     .ToList();
-                bool allMet = completedCourses >= 10 && quizScores.Count > 0 && quizScores.Average() >= 80;
+                bool allMet = completedCourses >= 3 && quizScores.Count > 0 && quizScores.Average() >= 80;
 
                 if (!allMet) return;
 

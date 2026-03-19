@@ -11,13 +11,16 @@ namespace WokFlow.Pages.Auth
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Clear session and cache
             Session.Clear();
             Session.Abandon();
 
+            // Clear authentication cookie
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Cache.SetNoStore();
             Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
 
+            // Redirect to login page
             Response.Redirect("~/Pages/Default.aspx", false);
             Context.ApplicationInstance.CompleteRequest();
         }

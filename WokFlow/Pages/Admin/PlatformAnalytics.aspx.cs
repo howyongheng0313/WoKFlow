@@ -14,10 +14,12 @@ namespace WokFlow.Pages.Admin
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack) PopulateYearFilters();
+            if (!IsPostBack)
+                PopulateYearFilters();
             BindData();
         }
 
+        // Populates year filter dropdowns with distinct years from user and course data.
         private void PopulateYearFilters()
         {
             using (var db = new WokFlowContext())
@@ -36,14 +38,12 @@ namespace WokFlow.Pages.Admin
                     ddl.Items.Clear();
                     ddl.Items.Add(new System.Web.UI.WebControls.ListItem("All Years", ""));
                     foreach (var y in years)
-                    {
                         ddl.Items.Add(new System.Web.UI.WebControls.ListItem(y.ToString(), y.ToString()));
-                    }
-                       
                 }
             }
         }
 
+        // Builds all chart datasets and serializes them as JSON for the front-end Chart.js rendering.
         private void BindData()
         {
             using (var db = new WokFlowContext())
@@ -60,47 +60,47 @@ namespace WokFlow.Pages.Admin
                 // Registration Trend – count new user registrations per month
                 string regYearVal = ddlRegYear.SelectedValue;
                 var regUsersQuery = db.Users.AsQueryable();
-                if (!string.IsNullOrEmpty(regYearVal))
-                {
-                    int regYear = int.Parse(regYearVal);
+
+                if (!string.IsNullOrEmpty(regYearVal) && int.TryParse(regYearVal, out int regYear))
                     regUsersQuery = regUsersQuery.Where(u => u.JoinedDate.Year == regYear);
-                }
-                var regUsers = regUsersQuery.ToList();
+
+                var regGrouped = regUsersQuery
+                    .GroupBy(u => u.JoinedDate.Month)
+                    .Select(g => new { Month = g.Key, Count = g.Count() })
+                    .ToDictionary(g => g.Month, g => g.Count);
                 var regData = Enumerable.Range(1, 12)
-                    .Select(m => regUsers.Count(u => u.JoinedDate.Month == m))
+                    .Select(m => regGrouped.ContainsKey(m) ? regGrouped[m] : 0)
                     .ToList();
 
                 // Cuisine Categories – count active courses per cuisine
                 string cuisineYearVal = ddlCuisineYear.SelectedValue;
-                var cuisines = db.Cuisines.ToList();
-                var cuisineLabels = new List<string>();
-                var cuisineValues = new List<int>();
-                foreach (var c in cuisines)
-                {
-                    cuisineLabels.Add(c.CuisineName.ToUpper());
-                    var courseQuery = db.Courses.Where(co =>
-                        co.CuisineId == c.CuisineId && co.Status == "Active");
-                    if (!string.IsNullOrEmpty(cuisineYearVal))
-                    {
-                        int cuisineYear = int.Parse(cuisineYearVal);
-                        courseQuery = courseQuery.Where(co => co.CreatedDate.Year == cuisineYear);
-                    }
-                    cuisineValues.Add(courseQuery.Count());
-                }
+                var courseQuery = db.Courses.Where(co => co.Status == "Active");
+
+                if (!string.IsNullOrEmpty(cuisineYearVal) && int.TryParse(cuisineYearVal, out int cuisineYear))
+                    courseQuery = courseQuery.Where(co => co.CreatedDate.Year == cuisineYear);
+
+                var courseCounts = courseQuery
+                    .GroupBy(co => co.CuisineId)
+                    .Select(g => new { CuisineId = g.Key, Count = g.Count() })
+                    .ToDictionary(g => g.CuisineId, g => g.Count);
+
+                var cuisines = db.Cuisines.OrderBy(c => c.CuisineName).ToList();
+                var cuisineLabels = cuisines.Select(c => c.CuisineName.ToUpper()).ToList();
+                var cuisineValues = cuisines.Select(c => courseCounts.ContainsKey(c.CuisineId) ? courseCounts[c.CuisineId] : 0).ToList();
 
                 // User Role Breakdown – actual user counts
                 string rolesYearVal = ddlRolesYear.SelectedValue;
                 string rolesMonth = ddlRolesMonth.SelectedValue;
                 var rolesQuery = db.Users.AsQueryable();
-                if (!string.IsNullOrEmpty(rolesYearVal))
-                {
-                    int rolesYear = int.Parse(rolesYearVal);
+
+                if (!string.IsNullOrEmpty(rolesYearVal) && int.TryParse(rolesYearVal, out int rolesYear))
                     rolesQuery = rolesQuery.Where(u => u.JoinedDate.Year == rolesYear);
-                }
-                if (rolesMonth != "All")
+
+                if (rolesMonth != "All" && DateTime.TryParseExact(rolesMonth, "MMMM",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out DateTime parsedMonth))
                 {
-                    int monthNum = DateTime.ParseExact(rolesMonth, "MMMM",
-                        System.Globalization.CultureInfo.InvariantCulture).Month;
+                    int monthNum = parsedMonth.Month;
                     rolesQuery = rolesQuery.Where(u => u.JoinedDate.Month == monthNum);
                 }
 
@@ -129,6 +129,7 @@ namespace WokFlow.Pages.Admin
             }
         }
 
+        // Re-binds chart data when any filter dropdown changes.
         protected void Filter_Changed(object sender, EventArgs e)
         {
             BindData();

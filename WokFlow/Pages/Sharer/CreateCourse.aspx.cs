@@ -597,13 +597,19 @@ namespace WokFlow.Pages.Sharer
                     {
                         var oldQs = db.Questions.Where(q => q.ChapterId == ch.ChapterId).ToList();
                         foreach (var q in oldQs)
+                        {
                             db.Answers.RemoveRange(db.Answers.Where(a => a.QuestionId == q.QuestionId));
+                        }
                         db.Questions.RemoveRange(oldQs);
 
                         var oldProgress = db.UserChapterProgress.Where(p => p.ChapterId == ch.ChapterId);
                         db.UserChapterProgress.RemoveRange(oldProgress);
+
+                        var oldQuizResults = db.QuizResults.Where(qr => qr.ChapterId == ch.ChapterId);
+                        db.QuizResults.RemoveRange(oldQuizResults);
                     }
                     db.Chapters.RemoveRange(oldChapters);
+
                     db.SaveChanges();
                 }
 
