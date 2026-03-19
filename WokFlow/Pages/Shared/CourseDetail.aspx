@@ -76,7 +76,7 @@
                                 <%= CurrentUserName != null && CurrentUserName.Length > 0 ? CurrentUserName[0].ToString().ToUpper() : "?" %>
                             </div>
                             <div class="flex-1">
-                                <asp:HiddenField ID="hdnRating" runat="server" Value="0" />
+                                <asp:HiddenField ID="hdnRating" runat="server" Value="0" ClientIDMode="Static" />
                                 <div class="flex gap-1 mb-3" id="starRating">
                                     <span class="star text-2xl cursor-pointer" data-value="1">&#9733;</span>
                                     <span class="star text-2xl cursor-pointer" data-value="2">&#9733;</span>
@@ -171,7 +171,7 @@
                     </asp:Panel>
                     <asp:Panel ID="pnlQuizContent" runat="server" Visible="false">
                         <p class="text-sm font-bold text-[#1A1A1A] mb-4"><asp:Literal ID="litQuizQuestion" runat="server" /></p>
-                        <asp:HiddenField ID="hdnSelectedAnswer" runat="server" />
+                        <asp:HiddenField ID="hdnSelectedAnswer" runat="server" ClientIDMode="Static" />
                         <asp:Repeater ID="rptQuizAnswers" runat="server">
                             <ItemTemplate>
                                 <div onclick='selectAnswer(this, <%# Eval("AnswerId") %>)'
@@ -237,7 +237,7 @@
                         </button>
                     </div>
 
-                    <asp:HiddenField ID="hdnReportReason" runat="server" />
+                    <asp:HiddenField ID="hdnReportReason" runat="server" ClientIDMode="Static" />
                     <textarea id="txtReportReason" rows="4"
                         class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-[#FF8C66] transition-colors"
                         placeholder="Describe the issue in detail..." oninput="syncReportReason()"></textarea>
@@ -271,7 +271,7 @@
             el.classList.add('border-[#FF8C66]', 'bg-orange-50');
             var radio = el.querySelector('.answer-radio');
             if (radio) { radio.style.backgroundColor = '#FF8C66'; radio.style.borderColor = '#FF8C66'; }
-            var hdn = document.getElementById('<%= hdnSelectedAnswer.ClientID %>');
+            var hdn = document.getElementById('hdnSelectedAnswer');
             if (hdn) hdn.value = answerId;
         }
 
@@ -279,7 +279,7 @@
         function openReportModal() {
             document.getElementById('reportModal').style.display = '';
             document.getElementById('txtReportReason').value = '';
-            document.getElementById('<%= hdnReportReason.ClientID %>').value = '';
+            document.getElementById('hdnReportReason').value = '';
             document.querySelectorAll('.report-pill').forEach(function (p) {
                 p.classList.remove('border-[#FF8C66]', 'text-[#FF8C66]', 'bg-orange-50');
             });
@@ -297,11 +297,11 @@
             syncReportReason();
         }
         function syncReportReason() {
-            document.getElementById('<%= hdnReportReason.ClientID %>').value = document.getElementById('txtReportReason').value;
+            document.getElementById('hdnReportReason').value = document.getElementById('txtReportReason').value;
         }
         function validateReport() {
             syncReportReason();
-            var reason = document.getElementById('<%= hdnReportReason.ClientID %>').value.trim();
+            var reason = document.getElementById('hdnReportReason').value.trim();
             if (!reason) {
                 document.getElementById('txtReportReason').style.borderColor = '#f87171';
                 document.getElementById('txtReportReason').focus();
@@ -317,7 +317,7 @@
         // Star rating
         (function () {
             var stars = document.querySelectorAll('#starRating .star');
-            var hdnRating = document.getElementById('<%= hdnRating.ClientID %>');
+            var hdnRating = document.getElementById('hdnRating');
             function setRating(val) {
                 if (hdnRating) hdnRating.value = val;
                 stars.forEach(function (s) {
