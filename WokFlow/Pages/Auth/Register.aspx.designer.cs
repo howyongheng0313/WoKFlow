@@ -13,6 +13,15 @@ namespace WokFlow.Pages.Auth
 
     public partial class Register
     {
+        /// <summary>
+        /// litPageTitle control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Literal litPageTitle;
+
+        /// <summary>
+        /// pnlRoleToggle control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel pnlRoleToggle;
 
         /// <summary>
         /// btnLearner control.
@@ -42,6 +51,16 @@ namespace WokFlow.Pages.Auth
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl roleSlider;
 
         /// <summary>
+        /// pnlResetRole control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel pnlResetRole;
+
+        /// <summary>
+        /// litResetRole control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Literal litResetRole;
+
+        /// <summary>
         /// txtFullName control.
         /// </summary>
         /// <remarks>
@@ -66,16 +85,40 @@ namespace WokFlow.Pages.Auth
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WokFlow.Controls.Calendar calBirthDate;
+        protected global::System.Web.UI.WebControls.Panel pnlBirthEdit;
 
         /// <summary>
-        /// countrySelector control.
+        /// calBirthDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
+        protected global::WokFlow.Controls.Calendar calBirthDate;
+
+        /// <summary>
+        /// txtBirthDateLocked control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtBirthDateLocked;
+
+        /// <summary>
+        /// pnlCountryEdit control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel pnlCountryEdit;
+
+        /// <summary>
+        /// countrySelector control.
+        /// </summary>
         protected global::WokFlow.Controls.CountrySelector countrySelector;
+
+        /// <summary>
+        /// txtCountryLocked control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.TextBox txtCountryLocked;
 
         /// <summary>
         /// txtPassword control.

@@ -218,7 +218,7 @@
             var input = document.getElementById('wfChatInput');
             var messages = document.getElementById('wfChatMessages');
 
-            var contactUrl = '<%= System.Web.HttpUtility.JavaScriptStringEncode(System.Configuration.ConfigurationManager.AppSettings["ContactUsUrl"] ?? "mailto:support@wokflow.com?subject=WokFlow%20Support%20Request") %>';
+            var contactUrl = '<%= System.Web.HttpUtility.JavaScriptStringEncode(System.Configuration.ConfigurationManager.AppSettings["ContactUsUrl"] ?? "mailto:wokflow.noreply@gmail.com?subject=WokFlow%20Support%20Request") %>';
 
             var history = [];
             var historyLoaded = false;

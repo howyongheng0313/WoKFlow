@@ -42,7 +42,7 @@
 
                 <div class="flex justify-between items-center pt-2">
                     <span class="text-sm font-medium text-[#1A1A1A]">Other issue with sign in</span>
-                    <span class="text-sm font-bold text-gray-500">Forget your password</span>
+                    <button id="btnForgotPassword" type="button" class="text-sm font-bold text-gray-500 hover:text-[#1A1A1A] transition-colors bg-transparent border-0 cursor-pointer">Forget your password</button>
                 </div>
             </div>
         </div>
@@ -56,6 +56,47 @@
         <a href="<%: ResolveUrl("~/Pages/Auth/Register.aspx") %>" class="text-[#1A1A1A] font-bold hover:text-gray-600 transition-colors no-underline">
             Create an account
         </a>
+    </div>
+
+    <!-- Forgot Password Overlay -->
+    <div id="forgotOverlay" class="hidden fixed inset-0 z-[80] bg-black/25 backdrop-blur-sm px-4">
+        <div class="h-full flex items-center justify-center">
+            <div id="forgotCard" class="w-full max-w-md rounded-2xl bg-white border border-orange-100 shadow-2xl overflow-hidden transition-all duration-300">
+                <div class="px-5 py-4 bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white">
+                    <h3 class="text-lg font-semibold">Reset Your Password</h3>
+                    <p id="forgotSubtitle" class="text-sm text-white/90 mt-1">Enter your account email address</p>
+                </div>
+                <div class="px-5 py-5">
+                    <div id="forgotStepEmail">
+                        <input id="forgotEmailInput" type="email" placeholder="you@example.com"
+                            class="w-full h-12 px-4 rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" />
+                        <p id="forgotEmailError" class="hidden text-sm text-red-600 mt-2">Email doesn't exist.</p>
+                        <button id="btnForgotNext" type="button"
+                            class="w-full h-11 mt-4 rounded-xl bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white font-semibold">
+                            Next
+                        </button>
+                    </div>
+
+                    <div id="forgotStepCode" class="hidden mt-1">
+                        <div class="flex justify-center gap-2 mb-4">
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                            <input class="forgot-digit w-11 h-12 text-center text-xl font-bold rounded-xl border border-orange-200 focus:outline-none focus:ring-2 focus:ring-[#FF8C66]/30" maxlength="1" inputmode="numeric" />
+                        </div>
+                        <p id="forgotCodeError" class="hidden text-sm text-red-600 text-center mb-3"></p>
+                        <button id="btnForgotVerify" type="button"
+                            class="w-full h-11 rounded-xl bg-gradient-to-r from-[#FF8C66] to-[#FF6B4A] text-white font-semibold">
+                            Verify Code
+                        </button>
+                    </div>
+
+                    <button id="btnForgotClose" type="button" class="w-full h-10 mt-3 rounded-xl border border-gray-300 text-gray-600 font-medium bg-white">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -76,5 +117,125 @@
             }
             lucide.createIcons();
         }
+
+        (function () {
+            var overlay = document.getElementById('forgotOverlay');
+            var openBtn = document.getElementById('btnForgotPassword');
+            var closeBtn = document.getElementById('btnForgotClose');
+            var nextBtn = document.getElementById('btnForgotNext');
+            var verifyBtn = document.getElementById('btnForgotVerify');
+            var emailInput = document.getElementById('forgotEmailInput');
+            var emailErr = document.getElementById('forgotEmailError');
+            var codeErr = document.getElementById('forgotCodeError');
+            var subtitle = document.getElementById('forgotSubtitle');
+            var emailStep = document.getElementById('forgotStepEmail');
+            var codeStep = document.getElementById('forgotStepCode');
+            var digitInputs = Array.prototype.slice.call(document.querySelectorAll('.forgot-digit'));
+
+            function showOverlay() {
+                overlay.classList.remove('hidden');
+                emailStep.classList.remove('hidden');
+                codeStep.classList.add('hidden');
+                subtitle.textContent = 'Enter your account email address';
+                emailErr.classList.add('hidden');
+                codeErr.classList.add('hidden');
+                emailInput.focus();
+            }
+
+            function hideOverlay() {
+                overlay.classList.add('hidden');
+            }
+
+            function collectCode() {
+                return digitInputs.map(function (d) { return d.value || ''; }).join('');
+            }
+
+            function toCodeStep(email) {
+                subtitle.textContent = 'Enter the 6-digit code sent to ' + email;
+                emailStep.classList.add('hidden');
+                codeStep.classList.remove('hidden');
+                digitInputs.forEach(function (d) { d.value = ''; });
+                if (digitInputs[0]) digitInputs[0].focus();
+            }
+
+            function requestCode() {
+                var email = (emailInput.value || '').trim();
+                emailErr.classList.add('hidden');
+                if (!email) {
+                    emailErr.textContent = "Email doesn't exist.";
+                    emailErr.classList.remove('hidden');
+                    return;
+                }
+
+                nextBtn.disabled = true;
+                fetch('<%: ResolveUrl("~/Handlers/ForgotPassword.ashx?action=request") %>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                    body: JSON.stringify({ email: email })
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (!res || !res.success) {
+                            emailInput.value = '';
+                            emailErr.textContent = "Email doesn't exist.";
+                            emailErr.classList.remove('hidden');
+                            return;
+                        }
+                        toCodeStep(email);
+                    })
+                    .finally(function () { nextBtn.disabled = false; });
+            }
+
+            function verifyCode() {
+                var email = (emailInput.value || '').trim();
+                var code = collectCode().trim();
+                codeErr.classList.add('hidden');
+                if (!/^\d{6}$/.test(code)) {
+                    codeErr.textContent = 'Please enter the full 6-digit code.';
+                    codeErr.classList.remove('hidden');
+                    return;
+                }
+
+                verifyBtn.disabled = true;
+                fetch('<%: ResolveUrl("~/Handlers/ForgotPassword.ashx?action=verify") %>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                    body: JSON.stringify({ email: email, code: code })
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (!res || !res.success) {
+                            codeErr.textContent = (res && res.message) ? res.message : 'Verification failed.';
+                            codeErr.classList.remove('hidden');
+                            return;
+                        }
+                        window.location.href = res.redirectUrl || '<%: ResolveUrl("~/Pages/Auth/Register.aspx?mode=reset") %>';
+                    })
+                    .finally(function () { verifyBtn.disabled = false; });
+            }
+
+            digitInputs.forEach(function (input, idx) {
+                input.addEventListener('input', function () {
+                    input.value = (input.value || '').replace(/\D/g, '').slice(0, 1);
+                    if (input.value && idx < digitInputs.length - 1) {
+                        digitInputs[idx + 1].focus();
+                    }
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !input.value && idx > 0) {
+                        digitInputs[idx - 1].focus();
+                    }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        verifyCode();
+                    }
+                });
+            });
+
+            openBtn.addEventListener('click', showOverlay);
+            closeBtn.addEventListener('click', hideOverlay);
+            nextBtn.addEventListener('click', requestCode);
+            verifyBtn.addEventListener('click', verifyCode);
+        })();
     </script>
 </asp:Content>

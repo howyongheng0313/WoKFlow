@@ -157,6 +157,8 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Handlers\Chatbot.ashx" />
+    <Content Include="Handlers\ForgotPassword.ashx" />
+    <Content Include="Handlers\RegisterVerification.ashx" />
     <Content Include="Images\courses\bibimbap.jpg" />
     <Content Include="Images\courses\carbonara.jpg" />
     <Content Include="Images\courses\dim-sum.jpg" />
@@ -303,8 +305,15 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Handlers\Chatbot.ashx.cs">
       <DependentUpon>Chatbot.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handlers\ForgotPassword.ashx.cs">
+      <DependentUpon>ForgotPassword.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handlers\RegisterVerification.ashx.cs">
+      <DependentUpon>RegisterVerification.ashx</DependentUpon>
     </Compile>
     <Compile Include="MinimalSite.Master.cs">
       <DependentUpon>MinimalSite.Master</DependentUpon>
